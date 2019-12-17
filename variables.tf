@@ -50,7 +50,7 @@ variable "domain" {
 
 # Service account
 
-variable "gcp_service_account_enabled" {
+variable "service_account_enabled" {
   type        = bool
   description = "True if GCP service account should be created."
 }

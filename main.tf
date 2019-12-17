@@ -24,7 +24,7 @@ data "google_project" "project" {
 }
 
 resource "google_service_account" "service_account" {
-  count = var.gcp_service_account_enabled == "true" ? 1 : 0
+  count = var.service_account_enabled ? 1 : 0
 
   account_id   = "${var.project}-${var.env}"
   display_name = "${var.project}-${var.env}"

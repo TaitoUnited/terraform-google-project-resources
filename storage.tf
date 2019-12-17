@@ -55,7 +55,7 @@ resource "google_storage_bucket_iam_member" "bucket_service_account_member" {
     google_service_account.service_account,
     google_storage_bucket.bucket,
   ]
-  count  = var.gcp_service_account_enabled == "true" ? length(var.storages) : 0
+  count  = var.service_account_enabled ? length(var.storages) : 0
   bucket = var.storages[count.index]
   /* TODO: Should be objectAdmin, but currently minio gateway requires admin */
   role   = "roles/storage.admin"
