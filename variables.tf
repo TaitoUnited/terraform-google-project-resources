@@ -14,6 +14,23 @@
  * limitations under the License.
  */
 
+# Google provider
+
+variable "project_id" {
+  type        = string
+  description = "Google Cloud project id. The project should already exist."
+}
+
+variable "region" {
+  type        = string
+  description = "Google Cloud region."
+}
+
+variable "zone" {
+  type        = string
+  description = "Google Cloud zone."
+}
+
 # Project
 
 variable "project" {
