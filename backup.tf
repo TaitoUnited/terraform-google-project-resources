@@ -44,7 +44,7 @@ resource "google_storage_bucket" "backup_bucket" {
       type = "Delete"
     }
     condition {
-      with_state = "ARCHIVED"
+      with_state = "ARCHIVED" // TODO: is this correct?
       age        = 1
     }
   }

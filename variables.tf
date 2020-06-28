@@ -78,7 +78,31 @@ variable "storage_classes" {
 variable "storage_days" {
   type    = list(string)
   default = []
-  description = "Archive days of each storage bucket."
+  description = "Archive days of each storage bucket. Use NUMBER-expiration to define expiration date instead."
+}
+
+variable "storage_cors" {
+  type    = list(string)
+  default = []
+  description = "Cors addresses for each storage bucket separated by colon (,)"
+}
+
+variable "storage_admins" {
+  type    = list(string)
+  default = ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
+  description = "Admins for each storage bucket separated by colon (,)"
+}
+
+variable "storage_object_admins" {
+  type    = list(string)
+  default = ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
+  description = "Object admins for each storage bucket separated by colon (,)"
+}
+
+variable "storage_object_viewers" {
+  type    = list(string)
+  default = ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
+  description = "Object viewers for each storage bucket separated by colon (,)"
 }
 
 # Backup

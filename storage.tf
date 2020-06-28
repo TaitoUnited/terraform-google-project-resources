@@ -26,9 +26,16 @@ resource "google_storage_bucket" "bucket" {
     purpose   = "storage"
   }
 
-  /* TODO: enable localhost only for dev and feat environments */
   cors {
-    origin = ["http://localhost", "https://${var.domain}"]
+    origin = (
+      length(var.storage_cors) > count.index
+        ? (
+          length(var.storage_cors[count.index]) > 1
+            ? split(",", var.storage_cors[count.index])
+            : [ "https://${var.domain}" ] // default
+        )
+        : [ "https://${var.domain}" ] // default
+    )
     method = ["GET"]
   }
 
@@ -40,8 +47,11 @@ resource "google_storage_bucket" "bucket" {
       type = "Delete"
     }
     condition {
-      with_state = "ARCHIVED"
-      age        = var.storage_days[count.index]
+      with_state = (
+        length(regexall(".*-expiration", var.storage_days[count.index])) > 0
+          ? "ANY" : "ARCHIVED"
+      )
+      age        = split("-", var.storage_days[count.index])[0]
     }
   }
 
@@ -50,14 +60,62 @@ resource "google_storage_bucket" "bucket" {
   }
 }
 
-resource "google_storage_bucket_iam_member" "bucket_service_account_member" {
+resource "google_storage_bucket_iam_binding" "bucket_admin" {
   depends_on = [
-    google_service_account.service_account,
     google_storage_bucket.bucket,
   ]
-  count  = var.service_account_enabled ? length(var.storages) : 0
-  bucket = var.storages[count.index]
-  /* TODO: Should be objectAdmin, but currently minio gateway requires admin */
-  role   = "roles/storage.admin"
-  member = "serviceAccount:${google_service_account.service_account[0].email}"
+  count   = length(var.storages)
+  bucket  = var.storages[count.index]
+  role    = "roles/storage.admin"
+  members = concat(
+    (
+      /* TODO: Should be objectAdmin, but currently minio gateway requires admin */
+      var.service_account_enabled
+        ? [ "serviceAccount:${google_service_account.service_account[0].email}" ]
+        : []
+    ),
+    length(var.storage_admins) > count.index
+      ? (
+          length(var.storage_admins[count.index]) > 1
+            ? split(",", var.storage_admins[count.index])
+            : []
+        )
+      : []
+  )
+}
+
+resource "google_storage_bucket_iam_binding" "bucket_object_admin" {
+  depends_on = [
+    google_storage_bucket.bucket,
+  ]
+  count   = length(var.storages)
+  bucket  = var.storages[count.index]
+  role    = "roles/storage.objectAdmin"
+  members = concat(
+    length(var.storage_object_admins) > count.index
+      ? (
+          length(var.storage_object_admins[count.index]) > 1
+            ? split(",", var.storage_object_admins[count.index])
+            : []
+        )
+      : []
+  )
+}
+
+resource "google_storage_bucket_iam_binding" "bucket_object_viewer" {
+  depends_on = [
+    google_storage_bucket.bucket,
+  ]
+  count   = length(var.storages)
+  bucket  = var.storages[count.index]
+  role    = "roles/storage.objectViewer"
+  members = concat(
+    length(var.storage_object_viewers) > count.index
+      ? (
+          length(var.storage_object_viewers[count.index]) > 1
+            ? split(",", var.storage_object_viewers[count.index])
+            : []
+        )
+      : []
+  )
 }
