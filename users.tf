@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
-terraform {
-  required_version = ">= 0.12"
+resource "google_service_account" "service_account" {
+  count = length(local.serviceAccounts)
+
+  account_id   = local.serviceAccounts[count.index].id
+  display_name = local.serviceAccounts[count.index].id
 }

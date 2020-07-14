@@ -1,5 +1,5 @@
 /**
- * Copyright 2019 Taito United
+ * Copyright 2020 Taito United
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ data "google_storage_transfer_project_service_account" "backup_bucket_transfer" 
 }
 
 resource "google_storage_bucket" "backup_bucket" {
-  count         = min(length(var.storages), length(var.backup_days))
+  count         = min(length(local.bucketsById), length(var.backup_days))
   name          = "${var.storages[count.index]}-backup"
   location      = var.backup_locations[count.index]
   storage_class = var.backup_days[count.index] >= 90 ? "COLDLINE" : "NEARLINE"
@@ -55,7 +55,7 @@ resource "google_storage_bucket" "backup_bucket" {
 }
 
 resource "google_storage_bucket_iam_member" "backup_bucket_transfer_member" {
-  count      = min(length(var.storages), length(var.backup_days))
+  count      = min(length(local.bucketsById), length(var.backup_days))
   bucket     = "${var.storages[count.index]}-backup"
   role       = "roles/storage.objectAdmin"
   member     = "serviceAccount:${data.google_storage_transfer_project_service_account.backup_bucket_transfer.email}"
@@ -63,7 +63,7 @@ resource "google_storage_bucket_iam_member" "backup_bucket_transfer_member" {
 }
 
 resource "google_storage_bucket_iam_member" "backup_bucket_transfer_member_legacy" {
-  count      = min(length(var.storages), length(var.backup_days))
+  count      = min(length(local.bucketsById), length(var.backup_days))
   bucket     = "${var.storages[count.index]}-backup"
   role       = "roles/storage.legacyBucketReader"
   member     = "serviceAccount:${data.google_storage_transfer_project_service_account.backup_bucket_transfer.email}"
@@ -71,7 +71,7 @@ resource "google_storage_bucket_iam_member" "backup_bucket_transfer_member_legac
 }
 
 resource "google_storage_bucket_iam_member" "bucket_transfer_member" {
-  count      = min(length(var.storages), length(var.backup_days))
+  count      = min(length(local.bucketsById), length(var.backup_days))
   bucket     = var.storages[count.index]
   role       = "roles/storage.objectViewer"
   member     = "serviceAccount:${data.google_storage_transfer_project_service_account.backup_bucket_transfer.email}"
@@ -79,7 +79,7 @@ resource "google_storage_bucket_iam_member" "bucket_transfer_member" {
 }
 
 resource "google_storage_bucket_iam_member" "bucket_transfer_member_legacy" {
-  count      = min(length(var.storages), length(var.backup_days))
+  count      = min(length(local.bucketsById), length(var.backup_days))
   bucket     = var.storages[count.index]
   role       = "roles/storage.legacyBucketReader"
   member     = "serviceAccount:${data.google_storage_transfer_project_service_account.backup_bucket_transfer.email}"
@@ -87,7 +87,7 @@ resource "google_storage_bucket_iam_member" "bucket_transfer_member_legacy" {
 }
 
 resource "google_storage_transfer_job" "backup_bucket_transfer" {
-  count       = min(length(var.storages), length(var.backup_days))
+  count       = min(length(local.bucketsById), length(var.backup_days))
   description = "${var.storages[count.index]} backup"
 
   transfer_spec {

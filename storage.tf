@@ -1,5 +1,5 @@
 /**
- * Copyright 2019 Taito United
+ * Copyright 2020 Taito United
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 
 resource "google_storage_bucket" "bucket" {
-  count         = length(var.storages)
-  name          = var.storages[count.index]
-  location      = var.storage_locations[count.index]
-  storage_class = var.storage_classes[count.index]
+  count         = length(local.bucketsById)
+  name          = values(local.bucketsById)[count.index].name
+  location      = values(local.bucketsById)[count.index].location
+  storage_class = values(local.bucketsById)[count.index].storageClass
 
   labels = {
     project   = var.project
@@ -27,31 +27,56 @@ resource "google_storage_bucket" "bucket" {
   }
 
   cors {
-    origin = (
-      length(var.storage_cors) > count.index
-        ? (
-          length(var.storage_cors[count.index]) > 1
-            ? split(",", var.storage_cors[count.index])
-            : [ "https://${var.domain}" ] // default
-        )
-        : [ "https://${var.domain}" ] // default
-    )
+    origin = [
+      for cors in values(local.bucketsById)[count.index].cors:
+      cors.domain
+    ]
     method = ["GET"]
   }
 
   versioning {
-    enabled = "true"
+    enabled = values(local.bucketsById)[count.index].versioning
   }
-  lifecycle_rule {
-    action {
-      type = "Delete"
+
+  # transition
+  dynamic "lifecycle_rule" {
+    for_each = try(values(local.bucketsById)[count.index].transitionRetainDays, null) != null ? [1] : []
+    content {
+      condition {
+        age = values(local.bucketsById)[count.index].transitionRetainDays
+      }
+      action {
+        type = "SetStorageClass"
+        storage_class = values(local.bucketsById)[count.index].transitionStorageClass
+      }
     }
-    condition {
-      with_state = (
-        length(regexall(".*-expiration", var.storage_days[count.index])) > 0
-          ? "ANY" : "ARCHIVED"
-      )
-      age        = split("-", var.storage_days[count.index])[0]
+  }
+
+  # versioning
+  dynamic "lifecycle_rule" {
+    for_each = try(values(local.bucketsById)[count.index].versioningRetainDays, null) != null ? [1] : []
+    content {
+      condition {
+        age = values(local.bucketsById)[count.index].versioningRetainDays
+        with_state = "ARCHIVED"
+      }
+      action {
+        type = "Delete"
+      }
+    }
+  }
+
+  # autoDeletion
+  dynamic "lifecycle_rule" {
+    for_each = try(values(local.bucketsById)[count.index].autoDeletionRetainDays, null) != null ? [1] : []
+    content {
+      condition {
+        age = values(local.bucketsById)[count.index].autoDeletionRetainDays
+        with_state = "ANY"
+      }
+      action {
+        type = "Delete"
+      }
     }
   }
 
@@ -64,58 +89,37 @@ resource "google_storage_bucket_iam_binding" "bucket_admin" {
   depends_on = [
     google_storage_bucket.bucket,
   ]
-  count   = length(var.storages)
-  bucket  = var.storages[count.index]
+  count   = length(local.bucketsById)
+  bucket  = values(local.bucketsById)[count.index].name
   role    = "roles/storage.admin"
-  members = concat(
-    (
-      /* TODO: Should be objectAdmin, but currently minio gateway requires admin */
-      var.service_account_enabled
-        ? [ "serviceAccount:${google_service_account.service_account[0].email}" ]
-        : []
-    ),
-    length(var.storage_admins) > count.index
-      ? (
-          length(var.storage_admins[count.index]) > 1
-            ? split(",", var.storage_admins[count.index])
-            : []
-        )
-      : []
-  )
+  members = [
+    for user in try(values(local.bucketsById)[count.index].admins, []):
+    user.id
+  ]
 }
 
 resource "google_storage_bucket_iam_binding" "bucket_object_admin" {
   depends_on = [
     google_storage_bucket.bucket,
   ]
-  count   = length(var.storages)
-  bucket  = var.storages[count.index]
+  count   = length(local.bucketsById)
+  bucket  = values(local.bucketsById)[count.index].name
   role    = "roles/storage.objectAdmin"
-  members = concat(
-    length(var.storage_object_admins) > count.index
-      ? (
-          length(var.storage_object_admins[count.index]) > 1
-            ? split(",", var.storage_object_admins[count.index])
-            : []
-        )
-      : []
-  )
+  members = [
+    for user in try(values(local.bucketsById)[count.index].objectAdmins, []):
+    user.id
+  ]
 }
 
 resource "google_storage_bucket_iam_binding" "bucket_object_viewer" {
   depends_on = [
     google_storage_bucket.bucket,
   ]
-  count   = length(var.storages)
-  bucket  = var.storages[count.index]
+  count   = length(local.bucketsById)
+  bucket  = values(local.bucketsById)[count.index].name
   role    = "roles/storage.objectViewer"
-  members = concat(
-    length(var.storage_object_viewers) > count.index
-      ? (
-          length(var.storage_object_viewers[count.index]) > 1
-            ? split(",", var.storage_object_viewers[count.index])
-            : []
-        )
-      : []
-  )
+  members = [
+    for user in try(values(local.bucketsById)[count.index].objectViewers, []):
+    user.id
+  ]
 }
