@@ -93,7 +93,12 @@ resource "google_storage_bucket_iam_binding" "bucket_admin" {
   bucket  = values(local.bucketsById)[count.index].name
   role    = "roles/storage.admin"
   members = [
-    for user in try(values(local.bucketsById)[count.index].admins, []):
+    for user in try(
+      values(local.bucketsById)[count.index].admins != null
+      ? values(local.bucketsById)[count.index].admins
+      : [],
+      []
+    ):
     user.id
   ]
 }
@@ -106,7 +111,12 @@ resource "google_storage_bucket_iam_binding" "bucket_object_admin" {
   bucket  = values(local.bucketsById)[count.index].name
   role    = "roles/storage.objectAdmin"
   members = [
-    for user in try(values(local.bucketsById)[count.index].objectAdmins, []):
+    for user in try(
+      values(local.bucketsById)[count.index].objectAdmins != null
+      ? values(local.bucketsById)[count.index].objectAdmins
+      : [],
+      []
+    ):
     user.id
   ]
 }
@@ -119,7 +129,12 @@ resource "google_storage_bucket_iam_binding" "bucket_object_viewer" {
   bucket  = values(local.bucketsById)[count.index].name
   role    = "roles/storage.objectViewer"
   members = [
-    for user in try(values(local.bucketsById)[count.index].objectViewers, []):
+    for user in try(
+      values(local.bucketsById)[count.index].objectViewers != null
+      ? values(local.bucketsById)[count.index].objectViewers
+      : [],
+      []
+    ):
     user.id
   ]
 }
