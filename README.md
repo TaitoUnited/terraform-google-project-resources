@@ -133,7 +133,7 @@ With `create_*` variables you can choose which resources are created/updated in 
 And choose to update gateway, containers, and functions on every deployment in your CI/CD pipeline:
 
 ```
-  create_gateway                = true
+  create_ingress                = true
   create_containers             = true
   create_functions              = true
   create_function_permissions   = true

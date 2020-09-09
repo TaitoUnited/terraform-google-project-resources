@@ -52,7 +52,7 @@ variable "create_topics" {
   description = "If true, topics are created."
 }
 
-variable "create_gateway" {
+variable "create_ingress" {
   type        = bool
   default     = false
   description = "If true, API Gateway is created. (TODO)"
