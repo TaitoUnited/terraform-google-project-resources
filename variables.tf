@@ -88,6 +88,18 @@ variable "create_uptime_checks" {
   description = "If true, uptime check and alert is created for each service with uptime path set."
 }
 
+variable "create_alert_metrics" {
+  type        = bool
+  default     = false
+  description = "If true, log metrics are created for all log alerts."
+}
+
+variable "create_alerts_policies" {
+  type        = bool
+  default     = false
+  description = "If true, alert policies are created for all alerts"
+}
+
 # variable "create_container_image_repositories" {
 #   type        = bool
 #   default     = false
