@@ -28,6 +28,12 @@
 #   description = "If true, a domain certificate is created for each domain."
 # }
 
+variable "create_build_trigger" {
+  type        = bool
+  default     = false
+  description = "If true, build trigger will be created."
+}
+
 variable "create_storage_buckets" {
   type        = bool
   default     = false
@@ -137,6 +143,18 @@ variable "env" {
   description = "Environment: e.g. \"dev\""
 }
 
+# Version control info
+
+variable "vc_repo" {
+  type        = string
+  description = "Repository: e.g. \"git_myorg_my-project\""
+}
+
+variable "vc_branch" {
+  type        = string
+  description = "Branch: e.g. \"dev\""
+}
+
 # Uptime settings
 
 variable "uptime_channels" {
@@ -145,9 +163,9 @@ variable "uptime_channels" {
   description = "SNS topics used to send alert notifications (e.g. \"arn:aws:sns:us-east-1:0123456789:my-zone-uptimez\")"
 }
 
-# Additional variables as a json/yaml
+# Resources as a json/yaml
 
-variable "variables" {
-  type    = any
-  description = "Ingress and services as json/yaml. See README.md for format."
+variable "resources" {
+  type        = any
+  description = "Resources as JSON (see README.md). You can read values from a YAML file with yamldecode()."
 }
