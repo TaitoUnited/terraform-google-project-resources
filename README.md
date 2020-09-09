@@ -81,10 +81,10 @@ stack:
       location: EU
       storageClass: STANDARD
       cors:
-        - domain: https://myproject.mydomain.com
-        - domain: https://www.myproject.mydomain.com
+        - origin: https://myproject.mydomain.com
+        - origin: https://www.myproject.mydomain.com
       # Object lifecycle
-      versioning: true
+      versioningEnabled: true
       versioningRetainDays: 60
       lockRetainDays: # TODO: implement
       transitionRetainDays:
