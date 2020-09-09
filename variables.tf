@@ -61,7 +61,7 @@ variable "create_topics" {
 variable "create_ingress" {
   type        = bool
   default     = false
-  description = "If true, API Gateway is created. (TODO)"
+  description = "If true, ingress is created. (TODO)"
 }
 
 variable "create_containers" {

@@ -136,33 +136,33 @@ locals {
     if var.create_storage_buckets && service.type == "bucket"
   }
 
-  gatewayFunctionsById = {
+  ingressFunctionsById = {
     for name, service in local.servicesById:
     name => service
     if var.create_ingress && local.ingress.enabled && service.type == "function" && try(service.path, "") != ""
   }
 
-  gatewayStaticContentsById = {
+  ingressStaticContentsById = {
     for name, service in local.servicesById:
     name => service
     if var.create_ingress && local.ingress.enabled && service.type == "static"
   }
 
-  gatewayRootStaticContentsById = {
-    for name, service in local.gatewayStaticContentsById:
+  ingressRootStaticContentsById = {
+    for name, service in local.ingressStaticContentsById:
     name => service
     if var.create_ingress && local.ingress.enabled && service.path != null && try(service.path, "") == "/"
   }
 
-  gatewayChildStaticContentsById = {
-    for name, service in local.gatewayStaticContentsById:
+  ingressChildStaticContentsById = {
+    for name, service in local.ingressStaticContentsById:
     name => service
     if var.create_ingress && local.ingress.enabled && service.path != null && try(service.path, "") != "/"
   }
 
-  gatewayEnabled = length(concat(
-    values(local.gatewayFunctionsById),
-    values(local.gatewayStaticContentsById),
+  ingressEnabled = length(concat(
+    values(local.ingressFunctionsById),
+    values(local.ingressStaticContentsById),
   )) > 0
 
 }
