@@ -117,6 +117,14 @@ services:
 serviceAccounts:
   - id: my-project-prod-server
   - id: my-project-prod-worker
+    # TODO: implement roles with google_project_iam_member
+    roles: [ "roles/cloudkms.publicKeyViewer" ]
+
+# TODO: implement API keys once they are available in Terraform provider
+apiKeys:
+  - name: my-project-prod-client
+    services: [ "maps.googleapis.com" ]
+    origins: [ "https://myproject.mydomain.com" ]
 ```
 
 With `create_*` variables you can choose which resources are created/updated in which phase. For example, you can choose to update some of the resources manually when the environment is created or updated:
@@ -150,13 +158,11 @@ Similar YAML format is used also by the following modules:
 * [Digital Ocean project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/digitalocean)
 * [Full-stack template (Helm chart for Kubernetes)](https://github.com/TaitoUnited/taito-charts/tree/master/full-stack)
 
-This module creates only resources for one project. That is, such resources should already exist that are shared among multiple projects (e.g. users, roles, vpc networks, database clusters). You can create the shared infrastructure with the following modules. The modules are Kubernetes-oriented, but you can also choose to leave Kubernetes out.
+This module creates resources for only one project. That is, such resources should already exist that are shared among multiple projects (e.g. users, roles, vpc networks, database clusters). You can create the shared infrastructure with the following modules. The modules are Kubernetes-oriented, but you can also choose to leave Kubernetes out.
 
-* [AWS Kubernetes infrastructure](https://registry.terraform.io/modules/TaitoUnited/kubernetes-infrastructure/aws)
-* [Azure Kubernetes infrastructure](https://registry.terraform.io/modules/TaitoUnited/kubernetes-infrastructure/azurerm)
 * [Google Cloud Kubernetes infrastructure](https://registry.terraform.io/modules/TaitoUnited/kubernetes-infrastructure/google)
-* [Digital Ocean Kubernetes infrastructure](https://registry.terraform.io/modules/TaitoUnited/kubernetes-infrastructure/digitalocean)
+* [Google Cloud project administration](https://registry.terraform.io/modules/TaitoUnited/project-admin/google)
 
 > TIP: This module is used by [project templates](https://taitounited.github.io/taito-cli/templates/#project-templates) of [Taito CLI](https://taitounited.github.io/taito-cli/). See the [full-stack-template](https://github.com/TaitoUnited/full-stack-template) as an example on how to use this module.
 
-Contributions are welcome! This module should include support for the most commonly used Google services. For more specific cases, the YAML can be extended with additional Terraform modules.
+Contributions are welcome! This module should include implementations for the most commonly used Google services. For more specific cases, the YAML can be extended with additional Terraform modules.
