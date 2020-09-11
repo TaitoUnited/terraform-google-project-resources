@@ -136,6 +136,7 @@ With `create_*` variables you can choose which resources are created/updated in 
   create_in_memory_databases    = true
   create_topics                 = true
   create_service_accounts       = true
+  create_api_keys               = true
   create_uptime_checks          = true
   create_alert_metrics          = true
   create_alert_policies         = true
@@ -158,10 +159,41 @@ Similar YAML format is used also by the following modules:
 * [Digital Ocean project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/digitalocean)
 * [Full-stack template (Helm chart for Kubernetes)](https://github.com/TaitoUnited/taito-charts/tree/master/full-stack)
 
-This module creates resources for only one project. That is, such resources should already exist that are shared among multiple projects (e.g. users, roles, vpc networks, database clusters). You can create the shared infrastructure with the following modules. The modules are Kubernetes-oriented, but you can also choose to leave Kubernetes out.
+This module creates resources for only one project. That is, such resources should already exist that are shared among multiple projects (e.g. users, roles, vpc networks, kubernetes, database clusters). You can create a shared kubernetes-based infrastructure with the [Google Cloud Kubernetes infrastructure](https://registry.terraform.io/modules/TaitoUnited/kubernetes-infrastructure/google) module (place it to an another GCP project). You can also reuse this [Google Cloud project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/google) module for GCP project administration and to create resources that are shared among multiple projects within the same GCP project:
 
-* [Google Cloud Kubernetes infrastructure](https://registry.terraform.io/modules/TaitoUnited/kubernetes-infrastructure/google)
-* [Google Cloud project administration](https://registry.terraform.io/modules/TaitoUnited/project-admin/google)
+```
+members:
+  - id: user:john.doe@mydomain.com
+    roles: [ "roles/viewer" ]
+
+apis:
+  - id: secretmanager.googleapis.com
+
+services:
+  state:
+    type: bucket
+    name: shared-state
+    location: EU
+    storageClass: STANDARD
+    # Object lifecycle
+    versioningEnabled: true
+    versioningRetainDays: 60
+    # User rights
+    admins:
+      - id: user:john.doe@mydomain.com
+    objectAdmins:
+      - id: user:jane.doe@mydomain.com
+    objectViewers:
+      - id: user:john.smith@mydomain.com
+```
+
+```
+  create_members                = true
+  create_apis                   = true
+  create_storage_buckets        = true
+```
+
+NOTE: Google Cloud Kubernetes infrastructure and Google Cloud project administration should not be used within the same GCP project. Either place your Kubernetes infrastructure to a different GCP project than your project administration and project resources, or use the Kubernetes infrastructure module for GCP project administration instead of the Google Cloud project administration module.
 
 > TIP: This module is used by [project templates](https://taitounited.github.io/taito-cli/templates/#project-templates) of [Taito CLI](https://taitounited.github.io/taito-cli/). See the [full-stack-template](https://github.com/TaitoUnited/full-stack-template) as an example on how to use this module.
 

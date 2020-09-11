@@ -28,6 +28,12 @@
 #   description = "If true, a domain certificate is created for each domain."
 # }
 
+variable "create_members" {
+  type        = bool
+  default     = false
+  description = "If true, members will be created."
+}
+
 variable "create_build_trigger" {
   type        = bool
   default     = false
@@ -85,7 +91,19 @@ variable "create_function_permissions" {
 variable "create_service_accounts" {
   type        = bool
   default     = false
-  description = "If true, service accounts are created. (TODO)"
+  description = "If true, service accounts are created."
+}
+
+variable "create_apis" {
+  type        = bool
+  default     = false
+  description = "If true, apis will be created."
+}
+
+variable "create_api_keys" {
+  type        = bool
+  default     = false
+  description = "If true, api keys are created. (TODO)"
 }
 
 variable "create_uptime_checks" {
@@ -133,7 +151,7 @@ variable "zone" {
 
 variable "project" {
   type        = string
-  description = "Project name: e.g. \"my-project\""
+  description = "Project name: e.g. \"my-project\". NOTE: This is not the name of the GCP project (one GCP project may contain multiple projects)."
 }
 
 # Environment info

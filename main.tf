@@ -22,10 +22,34 @@ provider "google" {
 
 locals {
 
+  # Members
+
+  members = try(
+    var.create_members && var.resources.members != null ? var.resources.members : [], []
+  )
+
+  memberRoles = flatten([
+    for member in keys(local.members) : [
+      for role in member.roles:
+      {
+        role = role
+        member = member.id
+      }
+    ]
+  ])
+
+  # Service accounts
+
   serviceAccounts = (
     var.create_service_accounts && try(var.resources.serviceAccounts, null) != null
     ? try(var.resources.serviceAccounts, [])
     : []
+  )
+
+  # APIs
+
+  apis = try(
+    var.create_apis && var.resources.apis != null ? var.resources.apis : [], []
   )
 
   # Alerts
