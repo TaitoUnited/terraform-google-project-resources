@@ -159,7 +159,7 @@ Similar YAML format is used also by the following modules:
 * [Digital Ocean project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/digitalocean)
 * [Full-stack template (Helm chart for Kubernetes)](https://github.com/TaitoUnited/taito-charts/tree/master/full-stack)
 
-This module creates resources for only one project. That is, such resources should already exist that are shared among multiple projects (e.g. users, roles, vpc networks, kubernetes, database clusters). You can create a shared kubernetes-based infrastructure with the [Google Cloud Kubernetes infrastructure](https://registry.terraform.io/modules/TaitoUnited/kubernetes-infrastructure/google) module (place it to an another GCP project). You can also reuse this [Google Cloud project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/google) module for GCP project administration and to create resources that are shared among multiple projects within the same GCP project:
+This module creates resources for only one project. That is, such resources should already exist that are shared among multiple projects (e.g. users, roles, vpc networks, kubernetes, database clusters). You can create a shared kubernetes-based infrastructure with the [Google Cloud Kubernetes infrastructure](https://registry.terraform.io/modules/TaitoUnited/kubernetes-infrastructure/google) module. You can also reuse this [Google Cloud project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/google) module for GCP project administration and to create resources that are shared among multiple projects within the same GCP project:
 
 ```
 members:
@@ -193,7 +193,7 @@ services:
   create_storage_buckets        = true
 ```
 
-NOTE: Google Cloud Kubernetes infrastructure and Google Cloud project administration should not be used within the same GCP project. Either place your Kubernetes infrastructure to a different GCP project than your project administration and project resources, or use the Kubernetes infrastructure module for GCP project administration instead of the Google Cloud project administration module.
+NOTE: Both [Google Cloud Kubernetes infrastructure](https://registry.terraform.io/modules/TaitoUnited/kubernetes-infrastructure/google) and [Google Cloud project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/google) module manage IAM. Either you should place them to different GCP projects (recommended), or you should set `create_members = false` for the [Google Cloud project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/google) module.
 
 > TIP: This module is used by [project templates](https://taitounited.github.io/taito-cli/templates/#project-templates) of [Taito CLI](https://taitounited.github.io/taito-cli/). See the [full-stack-template](https://github.com/TaitoUnited/full-stack-template) as an example on how to use this module.
 
