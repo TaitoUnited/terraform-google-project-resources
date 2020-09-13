@@ -15,7 +15,8 @@
  */
 
 resource "google_logging_metric" "log_alert_metric" {
-  count = var.create_alert_metrics ? length(local.logAlerts) : 0
+  count      = var.create_log_alert_metrics ? length(local.logAlerts) : 0
+  project    = local.log_alert_project_id
 
   name   = local.logAlerts[count.index].name
   filter = local.logAlerts[count.index].rule

@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-data "google_monitoring_notification_channel" "alert_channel" {
+data "google_monitoring_notification_channel" "log_alert_channel" {
   count        = length(local.alertChannelNames)
+  project      = local.log_alert_project_id
   display_name = local.alertChannelNames[count.index]
 }
 
@@ -25,13 +26,14 @@ resource "google_monitoring_alert_policy" "log_alert_policy" {
   depends_on = [
     google_logging_metric.log_alert_metric,
   ]
-  count = var.create_alerts_policies ? length(local.logAlerts) : 0
+  count      = var.create_log_alert_policies ? length(local.logAlerts) : 0
+  project    = local.log_alert_project_id
 
   display_name          = local.logAlerts[count.index].name
   enabled               = true
   notification_channels = [
     for i in local.logAlerts[count.index].channelIndices:
-    data.google_monitoring_notification_channel.alert_channel[i].name
+    data.google_monitoring_notification_channel.log_alert_channel[i].name
   ]
 
   combiner     = "OR"

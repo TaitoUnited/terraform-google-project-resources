@@ -22,6 +22,18 @@ provider "google" {
 
 locals {
 
+  # Projects
+
+  project_id           = var.project_id
+
+  log_alert_project_id = (
+    var.log_alert_project_id != "" ? var.log_alert_project_id : var.project_id
+  )
+
+  uptime_project_id = (
+    var.uptime_project_id != "" ? var.uptime_project_id : var.project_id
+  )
+
   # Members
 
   members = try(
@@ -130,11 +142,11 @@ locals {
     if var.create_functions && service.type == "function"
   }
 
-  functionsForPermissionsById = {
-    for name, service in local.servicesById:
-    name => service
-    if var.create_function_permissions && service.type == "function"
-  }
+  # functionsForPermissionsById = {
+  #   for name, service in local.servicesById:
+  #   name => service
+  #   if var.create_function_permissions && service.type == "function"
+  # }
 
   databasesById = {
     for name, service in local.servicesById:
@@ -189,7 +201,4 @@ locals {
     values(local.ingressStaticContentsById),
   )) > 0
 
-}
-
-data "google_project" "project" {
 }

@@ -130,25 +130,25 @@ apiKeys:
 With `create_*` variables you can choose which resources are created/updated in which phase. For example, you can choose to update some of the resources manually when the environment is created or updated:
 
 ```
-  create_build_trigger          = true
-  create_storage_buckets        = true
-  create_databases              = true
-  create_in_memory_databases    = true
-  create_topics                 = true
-  create_service_accounts       = true
-  create_api_keys               = true
-  create_uptime_checks          = true
-  create_alert_metrics          = true
-  create_alert_policies         = true
+  create_build_trigger           = true
+  create_storage_buckets         = true
+  create_databases               = true
+  create_in_memory_databases     = true
+  create_topics                  = true
+  create_service_accounts        = true
+  create_service_account_roles   = true
+  create_api_keys                = true
+  create_uptime_checks           = true
+  create_log_alert_metrics       = true
+  create_log_alert_policies      = true
 ```
 
 And choose to update ingress, containers, and functions on every deployment in your CI/CD pipeline:
 
 ```
-  create_ingress                = true
-  create_containers             = true
-  create_functions              = true
-  create_function_permissions   = true
+  create_ingress                 = true
+  create_containers              = true
+  create_functions               = true
 ```
 
 Similar YAML format is used also by the following modules:
@@ -188,12 +188,12 @@ services:
 ```
 
 ```
-  create_members                = true
-  create_apis                   = true
-  create_storage_buckets        = true
+  create_members                 = true
+  create_apis                    = true
+  create_storage_buckets         = true
 ```
 
-NOTE: Both [Google Cloud Kubernetes infrastructure](https://registry.terraform.io/modules/TaitoUnited/kubernetes-infrastructure/google) and [Google Cloud project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/google) module manage IAM. Either you should place them to different GCP projects (recommended), or you should set `create_members = false` for the [Google Cloud project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/google) module.
+NOTE: Both [Google Cloud Kubernetes infrastructure](https://registry.terraform.io/modules/TaitoUnited/kubernetes-infrastructure/google) and [Google Cloud project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/google) module manage IAM. Either you should place them to different GCP projects (recommended), or you should set `create_members = false` and `create_service_account_roles = false` for the [Google Cloud project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/google) module.
 
 > TIP: This module is used by [project templates](https://taitounited.github.io/taito-cli/templates/#project-templates) of [Taito CLI](https://taitounited.github.io/taito-cli/). See the [full-stack-template](https://github.com/TaitoUnited/full-stack-template) as an example on how to use this module.
 

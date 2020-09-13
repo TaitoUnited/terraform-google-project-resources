@@ -16,8 +16,8 @@
 
 resource "google_monitoring_uptime_check_config" "https" {
   count        = length(local.uptimeTargetsById)
+  project      = local.uptime_project_id
 
-  project      = var.project_id
   display_name = "${var.project}-${var.env}-${values(local.uptimeTargetsById)[count.index].id}"
   timeout      = "${try(values(local.uptimeTargetsById)[count.index].uptimeTimeout, 5)}s"
 
@@ -39,9 +39,9 @@ resource "google_monitoring_uptime_check_config" "https" {
 resource "google_monitoring_alert_policy" "https" {
   depends_on = [google_monitoring_uptime_check_config.https]
   count      = length(local.uptimeTargetsById) > 0 ? 1 : 0
+  project    = local.uptime_project_id
   enabled    = "true"
 
-  project               = var.project_id
   display_name          = "${var.project}-${var.env}"
   notification_channels = var.uptime_channels
 

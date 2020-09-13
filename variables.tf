@@ -82,16 +82,22 @@ variable "create_functions" {
   description = "If true, functions are created. (TODO)"
 }
 
-variable "create_function_permissions" {
-  type        = bool
-  default     = false
-  description = "If true, function permissions are created. (TODO)"
-}
+# variable "create_function_permissions" {
+#   type        = bool
+#   default     = false
+#   description = "If true, function permissions are created."
+# }
 
 variable "create_service_accounts" {
   type        = bool
   default     = false
   description = "If true, service accounts are created."
+}
+
+variable "create_service_account_roles" {
+  type        = bool
+  default     = false
+  description = "If true, service account IAM permissions are created. (TODO)"
 }
 
 variable "create_apis" {
@@ -112,16 +118,16 @@ variable "create_uptime_checks" {
   description = "If true, uptime check and alert is created for each service with uptime path set."
 }
 
-variable "create_alert_metrics" {
+variable "create_log_alert_metrics" {
   type        = bool
   default     = false
   description = "If true, log metrics are created for all log alerts."
 }
 
-variable "create_alerts_policies" {
+variable "create_log_alert_policies" {
   type        = bool
   default     = false
-  description = "If true, alert policies are created for all alerts"
+  description = "If true, alert policies are created for log alerts"
 }
 
 # variable "create_container_image_repositories" {
@@ -132,9 +138,20 @@ variable "create_alerts_policies" {
 
 # Google provider
 
+variable "log_alert_project_id" {
+  type        = string
+  default     = ""
+  description = "Google Cloud project id for log alerts. If not set, var.project_id will be used by default. The project should already exist."
+}
+
+variable "uptime_project_id" {
+  type        = string
+  description = "Google Cloud project id for uptime monitoring. If not set, var.project_id will be used by default. The project should already exist."
+}
+
 variable "project_id" {
   type        = string
-  description = "Google Cloud project id. The project should already exist."
+  description = "Google Cloud project id for resources. The project should already exist."
 }
 
 variable "region" {
