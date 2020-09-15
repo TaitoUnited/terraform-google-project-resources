@@ -163,7 +163,7 @@ NOTE: This module creates resources for only one project. That is, such resource
 - [Databases](https://registry.terraform.io/modules/TaitoUnited/databases/google)
 - [Storage](https://registry.terraform.io/modules/TaitoUnited/storage/google)
 - [Monitoring](https://registry.terraform.io/modules/TaitoUnited/monitoring/google)
-- [PostgreSQL privileges](https://registry.terraform.io/modules/TaitoUnited/postgresql-privileges/google)
-- [MySQL privileges](https://registry.terraform.io/modules/TaitoUnited/mysql-privileges/google)
+- [PostgreSQL privileges](https://registry.terraform.io/modules/TaitoUnited/privileges/postgresql)
+- [MySQL privileges](https://registry.terraform.io/modules/TaitoUnited/privileges/mysql)
 
 Contributions are welcome! This module should include implementations for the most commonly used Google services. For more specific cases, the YAML can be extended with additional Terraform modules.
