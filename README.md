@@ -21,7 +21,8 @@ ingress:
   createMainDomain: false
   domains:
     - name: myproject.mydomain.com
-      altName: www.myproject.mydomain.com
+      altDomains:
+        - name: www.myproject.mydomain.com
 
 services:
   admin:

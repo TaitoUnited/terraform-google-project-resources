@@ -189,6 +189,78 @@ variable "uptime_channels" {
 # Resources as a json/yaml
 
 variable "resources" {
-  type        = any
+  type = object({
+    backupEnabled = bool
+    uptimeEnabled = bool
+    alerts = list(object({
+      name = string
+      type = string
+      channels = list(string)
+      rule = string
+    }))
+    serviceAccounts = list(object({
+      id = string
+      roles = list(string)
+    }))
+    apiKeys = list(object({
+      name = string
+      services = list(string)
+      origins = list(string)
+    }))
+    ingress = object({
+      class = string
+      enabled = bool
+      createMainDomain = bool
+      domains = list(object({
+        name = string
+        altDomains = list(object({
+          name = string
+        }))
+      }))
+    })
+    services = map(object({
+      type = string
+      machineType = string
+      name = string
+      location = string
+      storageClass = string
+      cors = list(object({
+        origin = string
+      }))
+      versioningEnabled = bool
+      versioningRetainDays = number
+      lockRetainDays = number
+      transitionRetainDays = number
+      transitionStorageClass = string
+      autoDeletionRetainDays = number
+      replicationBucket = string
+      backupRetainDays = number
+      backupLocation = string
+      backupLock = bool
+      admins = list(object({
+        id = string
+      }))
+      objectAdmins = list(object({
+        id = string
+      }))
+      objectViewers = list(object({
+        id = string
+      }))
+      replicas = number
+      path = string
+      uptimePath = string
+      timeout = number
+      runtime = string
+      memoryRequest = number
+      secrets = map(string)
+      env = map(string)
+      publishers = list(object({
+        id = string
+      }))
+      subscribers = list(object({
+        id = string
+      }))
+    }))
+  })
   description = "Resources as JSON (see README.md). You can read values from a YAML file with yamldecode()."
 }
