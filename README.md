@@ -151,50 +151,18 @@ And choose to update ingress, containers, and functions on every deployment in y
   create_functions               = true
 ```
 
-Similar YAML format is used also by the following modules:
+Similar modules are also available for AWS, Azure, and DigitalOcean. All modules are used by [project templates](https://taitounited.github.io/taito-cli/templates/#project-templates) of [Taito CLI](https://taitounited.github.io/taito-cli/). See the [full-stack-template](https://github.com/TaitoUnited/full-stack-template) as an example on how to use these modules.
 
-* [AWS project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/aws)
-* [Azure project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/azurerm)
-* [Google Cloud project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/google)
-* [Digital Ocean project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/digitalocean)
-* [Full-stack template (Helm chart for Kubernetes)](https://github.com/TaitoUnited/taito-charts/tree/master/full-stack)
+NOTE: This module creates resources for only one project. That is, such resources should already exist that are shared among multiple projects (e.g. users, roles, vpc networks, kubernetes, database clusters). You can use the following modules to create the shared infrastructure:
 
-This module creates resources for only one project. That is, such resources should already exist that are shared among multiple projects (e.g. users, roles, vpc networks, kubernetes, database clusters). You can create a shared kubernetes-based infrastructure with the [Google Cloud Kubernetes infrastructure](https://registry.terraform.io/modules/TaitoUnited/kubernetes-infrastructure/google) module. You can also reuse this [Google Cloud project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/google) module for GCP project administration and to create resources that are shared among multiple projects within the same GCP project:
-
-```
-members:
-  - id: user:john.doe@mydomain.com
-    roles: [ "roles/viewer" ]
-
-apis:
-  - id: secretmanager.googleapis.com
-
-services:
-  state:
-    type: bucket
-    name: shared-state
-    location: EU
-    storageClass: STANDARD
-    # Object lifecycle
-    versioningEnabled: true
-    versioningRetainDays: 60
-    # User rights
-    admins:
-      - id: user:john.doe@mydomain.com
-    objectAdmins:
-      - id: user:jane.doe@mydomain.com
-    objectViewers:
-      - id: user:john.smith@mydomain.com
-```
-
-```
-  create_members                 = true
-  create_apis                    = true
-  create_storage_buckets         = true
-```
-
-NOTE: Both [Google Cloud Kubernetes infrastructure](https://registry.terraform.io/modules/TaitoUnited/kubernetes-infrastructure/google) and [Google Cloud project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/google) module manage IAM. Either you should place them to different GCP projects (recommended), or you should set `create_members = false` and `create_service_account_roles = false` for the [Google Cloud project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/google) module.
-
-> TIP: This module is used by [project templates](https://taitounited.github.io/taito-cli/templates/#project-templates) of [Taito CLI](https://taitounited.github.io/taito-cli/). See the [full-stack-template](https://github.com/TaitoUnited/full-stack-template) as an example on how to use this module.
+- [Admin](https://registry.terraform.io/modules/TaitoUnited/admin/google)
+- [DNS](https://registry.terraform.io/modules/TaitoUnited/dns/google)
+- [Network](https://registry.terraform.io/modules/TaitoUnited/network/google)
+- [Kubernetes](https://registry.terraform.io/modules/TaitoUnited/kubernetes/google)
+- [Databases](https://registry.terraform.io/modules/TaitoUnited/databases/google)
+- [Storage](https://registry.terraform.io/modules/TaitoUnited/storage/google)
+- [Monitoring](https://registry.terraform.io/modules/TaitoUnited/monitoring/google)
+- [PostgreSQL privileges](https://registry.terraform.io/modules/TaitoUnited/postgresql-privileges/google)
+- [MySQL privileges](https://registry.terraform.io/modules/TaitoUnited/mysql-privileges/google)
 
 Contributions are welcome! This module should include implementations for the most commonly used Google services. For more specific cases, the YAML can be extended with additional Terraform modules.

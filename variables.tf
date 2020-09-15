@@ -28,12 +28,6 @@
 #   description = "If true, a domain certificate is created for each domain."
 # }
 
-variable "create_members" {
-  type        = bool
-  default     = false
-  description = "If true, members will be created."
-}
-
 variable "create_build_trigger" {
   type        = bool
   default     = false
@@ -98,12 +92,6 @@ variable "create_service_account_roles" {
   type        = bool
   default     = false
   description = "If true, service account IAM permissions are created. (TODO)"
-}
-
-variable "create_apis" {
-  type        = bool
-  default     = false
-  description = "If true, apis will be created."
 }
 
 variable "create_api_keys" {
