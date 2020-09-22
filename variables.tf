@@ -124,18 +124,19 @@ variable "create_log_alert_policies" {
 #   description = "If true, container image repositories are created."
 # }
 
-# Google provider
+# Project
 
-variable "log_alert_project_id" {
+variable "project" {
   type        = string
-  default     = ""
-  description = "Google Cloud project id for log alerts. If not set, var.project_id will be used by default. The project should already exist."
+  description = "Project name: e.g. \"my-project\". NOTE: This is not the name of the GCP project (one GCP project may contain multiple projects)."
 }
 
-variable "uptime_project_id" {
+variable "env" {
   type        = string
-  description = "Google Cloud project id for uptime monitoring. If not set, var.project_id will be used by default. The project should already exist."
+  description = "Environment: e.g. \"dev\""
 }
+
+# Cloud provider
 
 variable "project_id" {
   type        = string
@@ -152,21 +153,7 @@ variable "zone" {
   description = "Google Cloud zone."
 }
 
-# Labels
-
-variable "project" {
-  type        = string
-  description = "Project name: e.g. \"my-project\". NOTE: This is not the name of the GCP project (one GCP project may contain multiple projects)."
-}
-
-# Environment info
-
-variable "env" {
-  type        = string
-  description = "Environment: e.g. \"dev\""
-}
-
-# Version control info
+# Version control
 
 variable "vc_repo" {
   type        = string
@@ -178,7 +165,28 @@ variable "vc_branch" {
   description = "Branch: e.g. \"dev\""
 }
 
+# CI/CD settings
+
+variable "cicd_project_id" {
+  type        = string
+  default     = ""
+  description = "Google Cloud project id for CI/CD (Cloud Build). If not set, var.project_id will be used by default. The project should already exist."
+}
+
+# Logging settings
+
+variable "log_alert_project_id" {
+  type        = string
+  default     = ""
+  description = "Google Cloud project id for log alerts. If not set, var.project_id will be used by default. The project should already exist."
+}
+
 # Uptime settings
+
+variable "uptime_project_id" {
+  type        = string
+  description = "Google Cloud project id for uptime monitoring. If not set, var.project_id will be used by default. The project should already exist."
+}
 
 variable "uptime_channels" {
   type = list(string)
