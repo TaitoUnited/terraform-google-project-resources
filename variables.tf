@@ -155,6 +155,11 @@ variable "zone" {
 
 # Version control
 
+variable "vc_provider" {
+  type        = string
+  description = "Version control provider (e.g. github)"
+}
+
 variable "vc_organization" {
   type        = string
   description = "Version control organization"
