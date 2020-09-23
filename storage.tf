@@ -90,6 +90,7 @@ resource "google_storage_bucket" "bucket" {
 resource "google_storage_bucket_iam_binding" "bucket_admin" {
   depends_on = [
     google_storage_bucket.bucket,
+    google_service_account.service_account,
   ]
   count   = length(local.bucketsById)
   bucket  = values(local.bucketsById)[count.index].name
@@ -108,6 +109,7 @@ resource "google_storage_bucket_iam_binding" "bucket_admin" {
 resource "google_storage_bucket_iam_binding" "bucket_object_admin" {
   depends_on = [
     google_storage_bucket.bucket,
+    google_service_account.service_account,
   ]
   count   = length(local.bucketsById)
   bucket  = values(local.bucketsById)[count.index].name
@@ -126,6 +128,7 @@ resource "google_storage_bucket_iam_binding" "bucket_object_admin" {
 resource "google_storage_bucket_iam_binding" "bucket_object_viewer" {
   depends_on = [
     google_storage_bucket.bucket,
+    google_service_account.service_account,
   ]
   count   = length(local.bucketsById)
   bucket  = values(local.bucketsById)[count.index].name
