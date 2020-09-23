@@ -24,7 +24,7 @@ resource "google_cloudbuild_trigger" "cicd_trigger" {
     owner = var.vc_organization
     name  = var.vc_repository
     push {
-      branch = "^${var.vc_branch}$$"
+      branch = "^${var.vc_branch}$"
     }
   }
 
