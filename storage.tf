@@ -27,7 +27,7 @@ resource "google_storage_bucket" "bucket" {
   }
 
   dynamic "cors" {
-    for_each = try(values(local.bucketsById)[count.index].cors, null) != null ? [values(local.bucketsById)[count.index].cors] : []
+    for_each = try(values(local.bucketsById)[count.index].cors, null) != null ? values(local.bucketsById)[count.index].cors : []
     content {
       origin = cors.origin
       method = try(cors.method, ["GET"])
