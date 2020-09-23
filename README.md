@@ -5,7 +5,6 @@ Provides Google Cloud resources typically required by projects. The resources ar
 ```
 backupEnabled: true
 uptimeEnabled: true
-
 alerts:
   - name: my-project-prod-errors
     type: log
@@ -14,6 +13,17 @@ alerts:
       resource.type="k8s_container"
       resource.labels.namespace_name="my-project-prod"
       severity>=ERROR
+
+# TODO: implement API keys once they are available in Terraform provider
+apiKeys:
+  - name: my-project-prod-client
+    services: [ "maps.googleapis.com" ]
+    origins: [ "https://myproject.mydomain.com" ]
+serviceAccounts:
+  - id: my-project-prod-server
+  - id: my-project-prod-worker
+    # TODO: implement roles with google_project_iam_member
+    roles: [ "roles/cloudkms.publicKeyViewer" ]
 
 ingress:
   class: gateway
@@ -114,18 +124,6 @@ services:
       - id: serviceAccount:my-project-prod-worker
     objectViewers:
       - id: user:john.doe@mydomain.com
-
-serviceAccounts:
-  - id: my-project-prod-server
-  - id: my-project-prod-worker
-    # TODO: implement roles with google_project_iam_member
-    roles: [ "roles/cloudkms.publicKeyViewer" ]
-
-# TODO: implement API keys once they are available in Terraform provider
-apiKeys:
-  - name: my-project-prod-client
-    services: [ "maps.googleapis.com" ]
-    origins: [ "https://myproject.mydomain.com" ]
 ```
 
 With `create_*` variables you can choose which resources are created/updated in which phase. For example, you can choose to update some of the resources manually when the environment is created or updated:

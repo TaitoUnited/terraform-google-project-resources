@@ -16,13 +16,24 @@
 
 resource "google_cloudbuild_trigger" "cicd_trigger" {
   count = var.create_build_trigger ? 1 : 0
+  provider = google-beta
 
   project = local.cicd_project_id
 
+  github {
+    owner = var.vc_organization
+    name  = var.vc_repository
+    push {
+      branch = "^${var.vc_branch}$$"
+    }
+  }
+
+  /* TODO: FOR MIRRORED REPO
   trigger_template {
     repo_name   = var.vc_repo
     branch_name = var.vc_branch
   }
+  */
 
   filename = "cloudbuild.yaml"
 }

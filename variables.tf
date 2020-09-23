@@ -155,10 +155,22 @@ variable "zone" {
 
 # Version control
 
+variable "vc_organization" {
+  type        = string
+  description = "Version control organization"
+}
+
+variable "vc_repository" {
+  type        = string
+  description = "Version control repository name"
+}
+
+/*
 variable "vc_repo" {
   type        = string
   description = "Repository: e.g. \"git_myorg_my-project\""
 }
+*/
 
 variable "vc_branch" {
   type        = string
