@@ -40,9 +40,8 @@ resource "google_monitoring_alert_policy" "log_alert_policy" {
   conditions {
     display_name = local.logAlerts[count.index].name
     condition_threshold {
-      filter     = "metric.type=\"logging.googleapis.com/user/${local.logAlerts[count.index].name}\""
-        # was also: AND resource.type=\"k8s_container\"
-      duration   = "0" # was 60s
+      filter     = "metric.type=\"logging.googleapis.com/user/${local.logAlerts[count.index].name}\" AND resource.type=\"k8s_container\""
+      duration   = "60s"
       comparison = "COMPARISON_GT"
       aggregations {
         alignment_period   = "60s"
