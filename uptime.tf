@@ -15,11 +15,11 @@
  */
 
 resource "google_monitoring_uptime_check_config" "https" {
-  count        = length(local.uptimeTargetsById)
+  for_each     = local.uptimeTargetsById
   project      = local.uptime_project_id
 
-  display_name = "${var.project}-${var.env}-${values(local.uptimeTargetsById)[count.index].id}"
-  timeout      = "${try(values(local.uptimeTargetsById)[count.index].uptimeTimeout, 5)}s"
+  display_name = "${var.project}-${var.env}-${each.value.id}"
+  timeout      = "${try(each.value.uptimeTimeout, 5)}s"
 
   monitored_resource {
     type = "uptime_url"
@@ -32,7 +32,7 @@ resource "google_monitoring_uptime_check_config" "https" {
     use_ssl = true
     validate_ssl = true
     port    = 443
-    path    = values(local.uptimeTargetsById)[count.index].uptimePath
+    path    = each.value.uptimePath
   }
 }
 

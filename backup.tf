@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-/*
+/* TODO
 data "google_storage_transfer_project_service_account" "backup_bucket_transfer" {
 }
 
 resource "google_storage_bucket" "backup_bucket" {
-  count         = min(length(local.bucketsById), length(var.backup_days))
-  name          = "${var.storages[count.index]}-backup"
-  location      = var.backup_locations[count.index]
+  for_each      = length(var.backup_days) > 0 ? local.bucketsById : {}
+  name          = "${each.value.name}-backup"
+  location      = each.value.backupLocation
   storage_class = var.backup_days[count.index] >= 90 ? "COLDLINE" : "NEARLINE"
 
   labels = {

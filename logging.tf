@@ -15,11 +15,11 @@
  */
 
 resource "google_logging_metric" "log_alert_metric" {
-  count      = var.create_log_alert_metrics ? length(local.logAlerts) : 0
+  for_each   = {for item in (var.create_log_alert_metrics ? local.logAlerts : []): item.name => item}
   project    = local.log_alert_project_id
 
-  name   = local.logAlerts[count.index].name
-  filter = local.logAlerts[count.index].rule
+  name   = each.value.name
+  filter = each.value.rule
   metric_descriptor {
     metric_kind = "DELTA"
     value_type  = "INT64"

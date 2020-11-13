@@ -15,9 +15,9 @@
  */
 
 data "google_monitoring_notification_channel" "log_alert_channel" {
-  count        = length(local.alertChannelNames)
+  for_each     = {for item in local.alertChannelNames: item => item}
   project      = local.log_alert_project_id
-  display_name = local.alertChannelNames[count.index]
+  display_name = each.value
 }
 
 # TODO: Add support for log metric absence
@@ -26,21 +26,21 @@ resource "google_monitoring_alert_policy" "log_alert_policy" {
   depends_on = [
     google_logging_metric.log_alert_metric,
   ]
-  count      = var.create_log_alert_policies ? length(local.logAlerts) : 0
+  for_each   = {for item in (var.create_log_alert_policies ? local.logAlerts : []): item.name => item}
   project    = local.log_alert_project_id
 
-  display_name          = local.logAlerts[count.index].name
+  display_name          = each.value.name
   enabled               = true
   notification_channels = [
-    for i in local.logAlerts[count.index].channelIndices:
+    for i in each.value.channelIndices:
     data.google_monitoring_notification_channel.log_alert_channel[i].name
   ]
 
   combiner     = "OR"
   conditions {
-    display_name = local.logAlerts[count.index].name
+    display_name = each.value.name
     condition_threshold {
-      filter     = "metric.type=\"logging.googleapis.com/user/${local.logAlerts[count.index].name}\" AND resource.type=\"k8s_container\""
+      filter     = "metric.type=\"logging.googleapis.com/user/${each.value.name}\" AND resource.type=\"k8s_container\""
       duration   = "60s"
       comparison = "COMPARISON_GT"
       aggregations {

@@ -15,10 +15,10 @@
  */
 
 resource "google_storage_bucket" "bucket" {
-  count         = length(local.bucketsById)
-  name          = values(local.bucketsById)[count.index].name
-  location      = values(local.bucketsById)[count.index].location
-  storage_class = values(local.bucketsById)[count.index].storageClass
+  for_each      = local.bucketsById
+  name          = each.value.name
+  location      = each.value.location
+  storage_class = each.value.storageClass
 
   labels = {
     project   = var.project
@@ -27,7 +27,7 @@ resource "google_storage_bucket" "bucket" {
   }
 
   dynamic "cors" {
-    for_each = try(values(local.bucketsById)[count.index].cors, null) != null ? values(local.bucketsById)[count.index].cors : []
+    for_each = try(each.value.cors, null) != null ? each.value.cors : []
     content {
       origin = [ cors.value.origin ]
       method = try(cors.value.method, ["GET"])
@@ -37,29 +37,29 @@ resource "google_storage_bucket" "bucket" {
   }
 
   versioning {
-    enabled = values(local.bucketsById)[count.index].versioningEnabled
+    enabled = each.value.versioningEnabled
   }
 
   # transition
   dynamic "lifecycle_rule" {
-    for_each = try(values(local.bucketsById)[count.index].transitionRetainDays, null) != null ? [1] : []
+    for_each = try(each.value.transitionRetainDays, null) != null ? [1] : []
     content {
       condition {
-        age = values(local.bucketsById)[count.index].transitionRetainDays
+        age = each.value.transitionRetainDays
       }
       action {
         type = "SetStorageClass"
-        storage_class = values(local.bucketsById)[count.index].transitionStorageClass
+        storage_class = each.value.transitionStorageClass
       }
     }
   }
 
   # versioning
   dynamic "lifecycle_rule" {
-    for_each = try(values(local.bucketsById)[count.index].versioningRetainDays, null) != null ? [1] : []
+    for_each = try(each.value.versioningRetainDays, null) != null ? [1] : []
     content {
       condition {
-        age = values(local.bucketsById)[count.index].versioningRetainDays
+        age = each.value.versioningRetainDays
         with_state = "ARCHIVED"
       }
       action {
@@ -70,10 +70,10 @@ resource "google_storage_bucket" "bucket" {
 
   # autoDeletion
   dynamic "lifecycle_rule" {
-    for_each = try(values(local.bucketsById)[count.index].autoDeletionRetainDays, null) != null ? [1] : []
+    for_each = try(each.value.autoDeletionRetainDays, null) != null ? [1] : []
     content {
       condition {
-        age = values(local.bucketsById)[count.index].autoDeletionRetainDays
+        age = each.value.autoDeletionRetainDays
         with_state = "ANY"
       }
       action {
@@ -92,13 +92,13 @@ resource "google_storage_bucket_iam_binding" "bucket_admin" {
     google_storage_bucket.bucket,
     google_service_account.service_account,
   ]
-  count   = length(local.bucketsById)
-  bucket  = values(local.bucketsById)[count.index].name
+  for_each = local.bucketsById
+  bucket  = each.value.name
   role    = "roles/storage.admin"
   members = [
     for user in try(
-      values(local.bucketsById)[count.index].admins != null
-      ? values(local.bucketsById)[count.index].admins
+      each.value.admins != null
+      ? each.value.admins
       : [],
       []
     ):
@@ -111,13 +111,13 @@ resource "google_storage_bucket_iam_binding" "bucket_object_admin" {
     google_storage_bucket.bucket,
     google_service_account.service_account,
   ]
-  count   = length(local.bucketsById)
-  bucket  = values(local.bucketsById)[count.index].name
+  for_each = local.bucketsById
+  bucket  = each.value.name
   role    = "roles/storage.objectAdmin"
   members = [
     for user in try(
-      values(local.bucketsById)[count.index].objectAdmins != null
-      ? values(local.bucketsById)[count.index].objectAdmins
+      each.value.objectAdmins != null
+      ? each.value.objectAdmins
       : [],
       []
     ):
@@ -130,13 +130,13 @@ resource "google_storage_bucket_iam_binding" "bucket_object_viewer" {
     google_storage_bucket.bucket,
     google_service_account.service_account,
   ]
-  count   = length(local.bucketsById)
-  bucket  = values(local.bucketsById)[count.index].name
+  for_each = local.bucketsById
+  bucket  = each.value.name
   role    = "roles/storage.objectViewer"
   members = [
     for user in try(
-      values(local.bucketsById)[count.index].objectViewers != null
-      ? values(local.bucketsById)[count.index].objectViewers
+      each.value.objectViewers != null
+      ? each.value.objectViewers
       : [],
       []
     ):
