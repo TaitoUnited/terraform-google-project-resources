@@ -25,6 +25,7 @@ resource "google_monitoring_uptime_check_config" "https" {
     type = "uptime_url"
     labels = {
       host = try(local.ingress.domains[0].name, null)
+      project_id = local.uptime_project_id
     }
   }
 
