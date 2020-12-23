@@ -205,6 +205,12 @@ variable "uptime_project_id" {
   description = "Google Cloud project id for uptime monitoring. If not set, var.project_id will be used by default. The project should already exist."
 }
 
+variable "uptime_regions" {
+  type = list(string)
+  default = ["EUROPE", "USA"]
+  description = "The list of regions from which the uptime check will be run."
+}
+
 variable "uptime_channels" {
   type = list(string)
   default = []
