@@ -157,7 +157,7 @@ locals {
   ingressFunctionsById = {
     for name, service in local.servicesById:
     name => service
-    if var.create_ingress && local.ingress.enabled && service.type == "function" && coalesce(service.path, "") != ""
+    if var.create_ingress && local.ingress.enabled && service.type == "function" && service.path != null
   }
 
   ingressStaticContentsById = {
