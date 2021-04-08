@@ -20,7 +20,7 @@ resource "google_monitoring_uptime_check_config" "https" {
   selected_regions = var.uptime_regions
 
   display_name = "${var.project}-${var.env}-${each.value.id}"
-  timeout      = "${try(each.value.uptimeTimeout, 5)}s"
+  timeout      = "${coalesce(each.value.uptimeTimeout, 5)}s"
 
   monitored_resource {
     type = "uptime_url"

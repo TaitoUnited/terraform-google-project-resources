@@ -19,6 +19,7 @@ apiKeys:
   - name: my-project-prod-client
     services: [ "maps.googleapis.com" ]
     origins: [ "https://myproject.mydomain.com" ]
+
 serviceAccounts:
   - id: my-project-prod-server
   - id: my-project-prod-worker
@@ -99,9 +100,10 @@ services:
     name: my-project-prod
     location: EU
     storageClass: STANDARD
-    cors:
-      - origin: https://myproject.mydomain.com
-      - origin: https://www.myproject.mydomain.com
+    corsRules:
+      - allowedOrigins:
+        - https://myproject.mydomain.com
+        - https://www.myproject.mydomain.com
     # Object lifecycle
     versioningEnabled: true
     versioningRetainDays: 60
@@ -150,18 +152,28 @@ And choose to update ingress, containers, and functions on every deployment in y
   create_functions               = true
 ```
 
-Similar modules are also available for AWS, Azure, and DigitalOcean. All modules are used by [project templates](https://taitounited.github.io/taito-cli/templates/#project-templates) of [Taito CLI](https://taitounited.github.io/taito-cli/). See the [full-stack-template](https://github.com/TaitoUnited/full-stack-template) as an example on how to use these modules.
+Similar YAML format is used also by the following modules:
 
-NOTE: This module creates resources for only one project. That is, such resources should already exist that are shared among multiple projects (e.g. users, roles, vpc networks, kubernetes, database clusters). You can use the following modules to create the shared infrastructure:
+* [AWS project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/aws)
+* [Azure project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/azurerm)
+* [Google Cloud project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/google)
+* [Digital Ocean project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/digitalocean)
+* [Full-stack template (Helm chart for Kubernetes)](https://github.com/TaitoUnited/taito-charts/tree/master/full-stack)
+
+NOTE: This module creates resources for only one project environment. That is, such resources should already exist that are shared among multiple projects or project environments (e.g. users, roles, vpc networks, kubernetes, database clusters). You can use the following modules to create the shared infrastructure:
 
 - [Admin](https://registry.terraform.io/modules/TaitoUnited/admin/google)
 - [DNS](https://registry.terraform.io/modules/TaitoUnited/dns/google)
 - [Network](https://registry.terraform.io/modules/TaitoUnited/network/google)
+- [Compute](https://registry.terraform.io/modules/TaitoUnited/compute/google)
 - [Kubernetes](https://registry.terraform.io/modules/TaitoUnited/kubernetes/google)
 - [Databases](https://registry.terraform.io/modules/TaitoUnited/databases/google)
 - [Storage](https://registry.terraform.io/modules/TaitoUnited/storage/google)
 - [Monitoring](https://registry.terraform.io/modules/TaitoUnited/monitoring/google)
+- [Integrations](https://registry.terraform.io/modules/TaitoUnited/integrations/google)
 - [PostgreSQL privileges](https://registry.terraform.io/modules/TaitoUnited/privileges/postgresql)
 - [MySQL privileges](https://registry.terraform.io/modules/TaitoUnited/privileges/mysql)
+
+> TIP: This module is used by [project templates](https://taitounited.github.io/taito-cli/templates/#project-templates) of [Taito CLI](https://taitounited.github.io/taito-cli/). See the [full-stack-template](https://github.com/TaitoUnited/full-stack-template) as an example on how to use this module.
 
 Contributions are welcome! This module should include implementations for the most commonly used Google services. For more specific cases, the YAML can be extended with additional Terraform modules.

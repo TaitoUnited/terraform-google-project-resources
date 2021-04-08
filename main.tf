@@ -41,14 +41,14 @@ locals {
   # Service accounts
 
   serviceAccounts = (
-    var.create_service_accounts && try(var.resources.serviceAccounts, null) != null
-    ? try(var.resources.serviceAccounts, [])
+    var.create_service_accounts && coalesce(var.resources.serviceAccounts, null) != null
+    ? coalesce(var.resources.serviceAccounts, [])
     : []
   )
 
   # Alerts
 
-  origAlerts = try(
+  origAlerts = coalesce(
     var.resources.alerts != null
     ? var.resources.alerts
     : [],
@@ -57,7 +57,7 @@ locals {
 
   alertChannelNames = flatten([
     for alert in local.origAlerts:
-    try(alert.channels, [])
+    coalesce(alert.channels, [])
   ])
 
   alerts = flatten([
@@ -72,14 +72,14 @@ locals {
 
   logAlerts = flatten([
     for alert in local.alerts:
-    try(alert.type, "") == "log" ? [ alert ] : []
+    coalesce(alert.type, "") == "log" ? [ alert ] : []
   ])
 
   # Ingress
 
-  ingress = try(var.resources.ingress, { enabled: false })
+  ingress = defaults(var.resources.ingress, { enabled: false })
 
-  domains = try(var.resources.ingress.domains, [])
+  domains = coalesce(var.resources.ingress.domains, [])
 
   mainDomains = [
     for domain in local.domains:
@@ -95,8 +95,8 @@ locals {
   # Services
 
   services = (
-    try(var.resources.services, null) != null
-    ? try(var.resources.services, {})
+    coalesce(var.resources.services, null) != null
+    ? coalesce(var.resources.services, {})
     : {}
   )
 
@@ -105,11 +105,11 @@ locals {
     id => merge(service, { id: id })
   }
 
-  uptimeEnabled = try(var.resources.uptimeEnabled, true)
+  uptimeEnabled = coalesce(var.resources.uptimeEnabled, true)
   uptimeTargetsById = {
     for name, service in local.servicesById:
     name => service
-    if var.create_uptime_checks && local.uptimeEnabled && try(service.uptimePath, null) != null
+    if var.create_uptime_checks && local.uptimeEnabled && coalesce(service.uptimePath, null) != null
   }
 
   containersById = {
@@ -157,7 +157,7 @@ locals {
   ingressFunctionsById = {
     for name, service in local.servicesById:
     name => service
-    if var.create_ingress && local.ingress.enabled && service.type == "function" && try(service.path, "") != ""
+    if var.create_ingress && local.ingress.enabled && service.type == "function" && coalesce(service.path, "") != ""
   }
 
   ingressStaticContentsById = {
@@ -169,13 +169,13 @@ locals {
   ingressRootStaticContentsById = {
     for name, service in local.ingressStaticContentsById:
     name => service
-    if var.create_ingress && local.ingress.enabled && service.path != null && try(service.path, "") == "/"
+    if var.create_ingress && local.ingress.enabled && service.path != null && coalesce(service.path, "") == "/"
   }
 
   ingressChildStaticContentsById = {
     for name, service in local.ingressStaticContentsById:
     name => service
-    if var.create_ingress && local.ingress.enabled && service.path != null && try(service.path, "") != "/"
+    if var.create_ingress && local.ingress.enabled && service.path != null && coalesce(service.path, "") != "/"
   }
 
   ingressEnabled = length(concat(

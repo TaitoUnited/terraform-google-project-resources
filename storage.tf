@@ -27,12 +27,12 @@ resource "google_storage_bucket" "bucket" {
   }
 
   dynamic "cors" {
-    for_each = try(each.value.cors, null) != null ? each.value.cors : []
+    for_each = coalesce(each.value.corsRules, null) != null ? each.value.corsRules : []
     content {
-      origin = [ cors.value.origin ]
-      method = try(cors.value.method, ["GET"])
-      response_header = try(cors.value.responseHeader, ["*"])
-      max_age_seconds = try(cors.value.maxAgeSeconds, 5)
+      origin = cors.value.allowedOrigins
+      method = coalesce(cors.value.allowedMethods, ["GET","HEAD"])
+      response_header = coalesce(cors.value.exposeHeaders, ["*"])
+      max_age_seconds = coalesce(cors.value.maxAgeSeconds, 5)
     }
   }
 
@@ -42,7 +42,7 @@ resource "google_storage_bucket" "bucket" {
 
   # transition
   dynamic "lifecycle_rule" {
-    for_each = try(each.value.transitionRetainDays, null) != null ? [1] : []
+    for_each = coalesce(each.value.transitionRetainDays, null) != null ? [1] : []
     content {
       condition {
         age = each.value.transitionRetainDays
@@ -56,7 +56,7 @@ resource "google_storage_bucket" "bucket" {
 
   # versioning
   dynamic "lifecycle_rule" {
-    for_each = try(each.value.versioningRetainDays, null) != null ? [1] : []
+    for_each = coalesce(each.value.versioningRetainDays, null) != null ? [1] : []
     content {
       condition {
         age = each.value.versioningRetainDays
@@ -70,7 +70,7 @@ resource "google_storage_bucket" "bucket" {
 
   # autoDeletion
   dynamic "lifecycle_rule" {
-    for_each = try(each.value.autoDeletionRetainDays, null) != null ? [1] : []
+    for_each = coalesce(each.value.autoDeletionRetainDays, null) != null ? [1] : []
     content {
       condition {
         age = each.value.autoDeletionRetainDays
@@ -96,7 +96,7 @@ resource "google_storage_bucket_iam_binding" "bucket_admin" {
   bucket  = each.value.name
   role    = "roles/storage.admin"
   members = [
-    for user in try(
+    for user in coalesce(
       each.value.admins != null
       ? each.value.admins
       : [],
@@ -115,7 +115,7 @@ resource "google_storage_bucket_iam_binding" "bucket_object_admin" {
   bucket  = each.value.name
   role    = "roles/storage.objectAdmin"
   members = [
-    for user in try(
+    for user in coalesce(
       each.value.objectAdmins != null
       ? each.value.objectAdmins
       : [],
@@ -134,7 +134,7 @@ resource "google_storage_bucket_iam_binding" "bucket_object_viewer" {
   bucket  = each.value.name
   role    = "roles/storage.objectViewer"
   members = [
-    for user in try(
+    for user in coalesce(
       each.value.objectViewers != null
       ? each.value.objectViewers
       : [],

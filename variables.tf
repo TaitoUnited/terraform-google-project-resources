@@ -16,12 +16,14 @@
 
 # Create flags
 
+# NOTE: NOT SUPPORTED BY THE GOOGLE MODULE
 # variable "create_domain" {
 #   type        = bool
 #   default     = false
 #   description = "If true, a DNS setup is created for each main domain."
 # }
-#
+
+# NOTE: NOT SUPPORTED BY THE GOOGLE MODULE
 # variable "create_domain_certificate" {
 #   type        = bool
 #   default     = false
@@ -55,7 +57,7 @@ variable "create_in_memory_databases" {
 variable "create_topics" {
   type        = bool
   default     = false
-  description = "If true, topics are created."
+  description = "If true, topics are created. (TODO)"
 }
 
 variable "create_ingress" {
@@ -76,6 +78,7 @@ variable "create_functions" {
   description = "If true, functions are created. (TODO)"
 }
 
+# NOTE: NOT SUPPORTED BY THE GOOGLE MODULE
 # variable "create_function_permissions" {
 #   type        = bool
 #   default     = false
@@ -118,6 +121,7 @@ variable "create_log_alert_policies" {
   description = "If true, alert policies are created for log alerts"
 }
 
+# NOTE: NOT SUPPORTED BY THE GOOGLE MODULE
 # variable "create_container_image_repositories" {
 #   type        = bool
 #   default     = false
@@ -221,77 +225,85 @@ variable "uptime_channels" {
 
 variable "resources" {
   type = object({
-    backupEnabled = bool
-    uptimeEnabled = bool
-    alerts = list(object({
+    backupEnabled = optional(bool)
+    uptimeEnabled = optional(bool)
+
+    alerts = optional(list(object({
       name = string
       type = string
       channels = list(string)
       rule = string
-    }))
-    serviceAccounts = list(object({
+    })))
+
+    serviceAccounts = optional(list(object({
       id = string
-      roles = list(string)
-    }))
-    apiKeys = list(object({
+      roles = optional(list(string))
+    })))
+
+    apiKeys = optional(list(object({
       name = string
       services = list(string)
       origins = list(string)
-    }))
-    ingress = object({
-      class = string
-      enabled = bool
-      createMainDomain = bool
+    })))
+
+    ingress = optional(object({
+      class = optional(string)
+      enabled = optional(bool)
+      createMainDomain = optional(bool)
       domains = list(object({
         name = string
         altDomains = list(object({
           name = string
         }))
       }))
-    })
-    services = map(object({
-      type = string
-      machineType = string
-      name = string
-      location = string
-      storageClass = string
-      cors = list(object({
-        origin = string
-      }))
-      versioningEnabled = bool
-      versioningRetainDays = number
-      lockRetainDays = number
-      transitionRetainDays = number
-      transitionStorageClass = string
-      autoDeletionRetainDays = number
-      replicationBucket = string
-      backupRetainDays = number
-      backupLocation = string
-      backupLock = bool
-      admins = list(object({
-        id = string
-      }))
-      objectAdmins = list(object({
-        id = string
-      }))
-      objectViewers = list(object({
-        id = string
-      }))
-      replicas = number
-      path = string
-      uptimePath = string
-      timeout = number
-      runtime = string
-      memoryRequest = number
-      secrets = map(string)
-      env = map(string)
-      publishers = list(object({
-        id = string
-      }))
-      subscribers = list(object({
-        id = string
-      }))
     }))
-  })
+
+    services = optional(map(object({
+      type = string
+      machineType = optional(string)
+      name = optional(string)
+      location = optional(string)
+      storageClass = optional(string)
+      corsRules = optional(list(object({
+        allowedOrigins = list(string)
+        allowedMethods = optional(list(string))
+        exposeHeaders = optional(list(string))
+        maxAgeSeconds = optional(number)
+      })))
+      versioningEnabled = optional(bool)
+      versioningRetainDays = optional(number)
+      lockRetainDays = optional(number)
+      transitionRetainDays = optional(number)
+      transitionStorageClass = optional(string)
+      autoDeletionRetainDays = optional(number)
+      replicationBucket = optional(string)
+      backupRetainDays = optional(number)
+      backupLocation = optional(string)
+      backupLock = optional(bool)
+      admins = optional(list(object({
+        id = string
+      })))
+      objectAdmins = optional(list(object({
+        id = string
+      })))
+      objectViewers = optional(list(object({
+        id = string
+      })))
+      replicas = optional(number)
+      path = optional(string)
+      uptimePath = optional(string)
+      timeout = optional(number)
+      runtime = optional(string)
+      memoryRequest = optional(number)
+      secrets = optional(map(string))
+      env = optional(map(string))
+      publishers = optional(list(object({
+        id = string
+      })))
+      subscribers = optional(list(object({
+        id = string
+      })))
+    }))
+  }))
   description = "Resources as JSON (see README.md). You can read values from a YAML file with yamldecode()."
 }
