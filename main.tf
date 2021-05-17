@@ -41,19 +41,14 @@ locals {
   # Service accounts
 
   serviceAccounts = (
-    var.create_service_accounts && coalesce(var.resources.serviceAccounts, null) != null
+    var.create_service_accounts
     ? coalesce(var.resources.serviceAccounts, [])
     : []
   )
 
   # Alerts
 
-  origAlerts = coalesce(
-    var.resources.alerts != null
-    ? var.resources.alerts
-    : [],
-    []
-  )
+  origAlerts = coalesce(var.resources.alerts, [])
 
   alertChannelNames = flatten([
     for alert in local.origAlerts:
@@ -94,11 +89,7 @@ locals {
 
   # Services
 
-  services = (
-    coalesce(var.resources.services, null) != null
-    ? coalesce(var.resources.services, {})
-    : {}
-  )
+  services = coalesce(var.resources.services, {})
 
   servicesById = {
     for id, service in local.services:
@@ -109,7 +100,7 @@ locals {
   uptimeTargetsById = {
     for name, service in local.servicesById:
     name => service
-    if var.create_uptime_checks && local.uptimeEnabled && coalesce(service.uptimePath, null) != null
+    if var.create_uptime_checks && local.uptimeEnabled && service.uptimePath != null
   }
 
   containersById = {
