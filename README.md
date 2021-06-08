@@ -104,6 +104,11 @@ services:
       - allowedOrigins:
         - https://myproject.mydomain.com
         - https://www.myproject.mydomain.com
+    queues: # TODO: implement
+      - name: ${st_bucket_name}
+        events:
+          - ...
+          - ...
     # Object lifecycle
     versioningEnabled: true
     versioningRetainDays: 60

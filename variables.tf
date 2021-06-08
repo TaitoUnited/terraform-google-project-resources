@@ -270,6 +270,10 @@ variable "resources" {
         exposeHeaders = optional(list(string))
         maxAgeSeconds = optional(number)
       })))
+      queues = optional(list(object({
+        name = string
+        events = list(string)
+      })))
       versioningEnabled = optional(bool)
       versioningRetainDays = optional(number)
       lockRetainDays = optional(number)
