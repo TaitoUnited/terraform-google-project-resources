@@ -72,6 +72,7 @@ services:
 
   worker:
     type: container # TODO: implement
+    image: my-registry/my-worker:1234
     replicas: 2
     memoryRequest: 128
     secrets:
@@ -97,7 +98,7 @@ services:
 
   bucket:
     type: bucket
-    name: my-project-prod
+    name: my-bucket-prod
     location: EU
     storageClass: STANDARD
     corsRules:
@@ -105,7 +106,7 @@ services:
         - https://myproject.mydomain.com
         - https://www.myproject.mydomain.com
     queues: # TODO: implement
-      - name: ${st_bucket_name}
+      - name: my-bucket-prod
         events:
           - ...
           - ...
@@ -159,11 +160,11 @@ And choose to update ingress, containers, and functions on every deployment in y
 
 Similar YAML format is used also by the following modules:
 
-* [AWS project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/aws)
-* [Azure project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/azurerm)
-* [Google Cloud project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/google)
-* [Digital Ocean project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/digitalocean)
-* [Full-stack template (Helm chart for Kubernetes)](https://github.com/TaitoUnited/taito-charts/tree/master/full-stack)
+- [AWS project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/aws)
+- [Azure project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/azurerm)
+- [Google Cloud project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/google)
+- [Digital Ocean project resources](https://registry.terraform.io/modules/TaitoUnited/project-resources/digitalocean)
+- [Full-stack template (Helm chart for Kubernetes)](https://github.com/TaitoUnited/taito-charts/tree/master/full-stack)
 
 NOTE: This module creates resources for only one project environment. That is, such resources should already exist that are shared among multiple projects or project environments (e.g. users, roles, vpc networks, kubernetes, database clusters). You can use the following modules to create the shared infrastructure:
 
