@@ -27,7 +27,11 @@ resource "google_storage_bucket" "bucket" {
   }
 
   dynamic "cors" {
-    for_each = coalesce(each.value.corsRules, null) != null ? each.value.corsRules : []
+    for_each = (
+      each.value.corsRules != null && each.value.corsRules != ""
+        ? each.value.corsRules
+        : []
+    )
     content {
       origin = cors.value.allowedOrigins
       method = coalesce(cors.value.allowedMethods, ["GET","HEAD"])
@@ -42,7 +46,13 @@ resource "google_storage_bucket" "bucket" {
 
   # transition
   dynamic "lifecycle_rule" {
-    for_each = coalesce(each.value.transitionRetainDays, null) != null ? [1] : []
+    for_each = (
+      each.value.transitionRetainDays != null &&
+        each.value.transitionRetainDays != ""
+      ? [1]
+      : []
+    )
+
     content {
       condition {
         age = each.value.transitionRetainDays
@@ -56,7 +66,13 @@ resource "google_storage_bucket" "bucket" {
 
   # versioning
   dynamic "lifecycle_rule" {
-    for_each = coalesce(each.value.versioningRetainDays, null) != null ? [1] : []
+    for_each = (
+      each.value.versioningRetainDays != null &&
+        each.value.versioningRetainDays != ""
+      ? [1]
+      : []
+    )
+
     content {
       condition {
         age = each.value.versioningRetainDays
@@ -70,7 +86,12 @@ resource "google_storage_bucket" "bucket" {
 
   # autoDeletion
   dynamic "lifecycle_rule" {
-    for_each = coalesce(each.value.autoDeletionRetainDays, null) != null ? [1] : []
+    for_each = (
+      each.value.autoDeletionRetainDays != null &&
+        each.value.autoDeletionRetainDays != ""
+      ? [1]
+      : []
+    )
     content {
       condition {
         age = each.value.autoDeletionRetainDays
