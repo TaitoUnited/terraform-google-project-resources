@@ -297,6 +297,7 @@ variable "resources" {
       replicas = optional(number)
       path = optional(string)
       uptimePath = optional(string)
+      uptimeTimeout = optional(number)
       timeout = optional(number)
       runtime = optional(string)
       memoryRequest = optional(number)
