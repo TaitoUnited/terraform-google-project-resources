@@ -72,7 +72,7 @@ locals {
 
   # Ingress
 
-  ingress = defaults(var.resources.ingress, { enabled: false })
+  ingress = merge({ enabled: false }, var.resources.ingress)
 
   domains = coalesce(var.resources.ingress.domains, [])
 
