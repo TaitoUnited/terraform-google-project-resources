@@ -24,8 +24,8 @@ auth:
           methods: ["GET*"]
 
   serviceAccounts:
-    - id: my-project-prod-server
-    - id: my-project-prod-worker
+    - name: my-project-prod-server
+    - name: my-project-prod-worker
       # TODO: implement roles with google_project_iam_member
       roles: [ "roles/cloudkms.publicKeyViewer" ]
 

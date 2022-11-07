@@ -237,7 +237,8 @@ variable "resources" {
 
     auth = optional(object({
       serviceAccounts = optional(list(object({
-        id = string
+        provider = optional(string)
+        name = string
         roles = optional(list(string))
       })))
 

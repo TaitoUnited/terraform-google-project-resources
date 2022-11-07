@@ -42,17 +42,17 @@ locals {
 
   apiKeysById = {
     for apiKey in coalesce(try(var.resources.auth.apiKeys, []), []):
-    "${apiKey.name}-${apiKey.provider}" => apiKey
+    "${apiKey.name}-${coalesce(apiKey.provider, "gcp")}" => apiKey
     if var.create_api_keys && coalesce(apiKey.provider, "gcp") == "gcp"
   }
 
   # Service accounts
 
-  serviceAccounts = (
-    var.create_service_accounts
-    ? try(var.resources.auth.serviceAccounts, [])
-    : []
-  )
+  serviceAccountsById = {
+    for acc in coalesce(try(var.resources.auth.serviceAccounts, []), []):
+    "${acc.name}-${coalesce(acc.provider, "gcp")}" => acc
+    if var.create_service_accounts && coalesce(acc.provider, "gcp") == "gcp"
+  }
 
   # Alerts
 
