@@ -5,6 +5,7 @@ Provides Google Cloud resources typically required by projects. The resources ar
 ```
 backupEnabled: true
 uptimeEnabled: true
+
 alerts:
   - name: my-project-prod-errors
     type: log
@@ -14,18 +15,19 @@ alerts:
       resource.labels.namespace_name="my-project-prod"
       severity>=ERROR
 
-apiKeys:
-  - name: my-project-prod-client
-    origins: [ "https://myproject.mydomain.com" ]
-    services:
-      - name: maps.googleapis.com
-        methods: ["GET*"]
+auth:
+  apiKeys:
+    - name: my-project-prod-client
+      origins: [ "https://myproject.mydomain.com" ]
+      services:
+        - name: maps.googleapis.com
+          methods: ["GET*"]
 
-serviceAccounts:
-  - id: my-project-prod-server
-  - id: my-project-prod-worker
-    # TODO: implement roles with google_project_iam_member
-    roles: [ "roles/cloudkms.publicKeyViewer" ]
+  serviceAccounts:
+    - id: my-project-prod-server
+    - id: my-project-prod-worker
+      # TODO: implement roles with google_project_iam_member
+      roles: [ "roles/cloudkms.publicKeyViewer" ]
 
 ingress:
   class: gateway

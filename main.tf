@@ -41,7 +41,7 @@ locals {
   # API keys
 
   apiKeysById = {
-    for apiKey in coalesce(var.resources.apiKeys, []):
+    for apiKey in coalesce(try(var.resources.auth.apiKeys, []), []):
     "${apiKey.name}-${apiKey.provider}" => apiKey
     if var.create_api_keys && coalesce(apiKey.provider, "gcp") == "gcp"
   }
@@ -50,7 +50,7 @@ locals {
 
   serviceAccounts = (
     var.create_service_accounts
-    ? coalesce(var.resources.serviceAccounts, [])
+    ? try(var.resources.auth.serviceAccounts, [])
     : []
   )
 

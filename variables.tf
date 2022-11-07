@@ -235,20 +235,22 @@ variable "resources" {
       rule = string
     })))
 
-    serviceAccounts = optional(list(object({
-      id = string
-      roles = optional(list(string))
-    })))
+    auth = optional(object({
+      serviceAccounts = optional(list(object({
+        id = string
+        roles = optional(list(string))
+      })))
 
-    apiKeys = optional(list(object({
-      provider = optional(string)
-      name = string
-      origins = optional(list(string))
-      services = list(object({
+      apiKeys = optional(list(object({
+        provider = optional(string)
         name = string
-        methods = optional(list(string))
-      }))
-    })))
+        origins = optional(list(string))
+        services = list(object({
+          name = string
+          methods = optional(list(string))
+        }))
+      })))
+    }))
 
     ingress = optional(object({
       class = optional(string)
