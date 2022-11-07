@@ -38,6 +38,14 @@ locals {
     var.uptime_project_id != "" ? var.uptime_project_id : var.project_id
   )
 
+  # API keys
+
+  apiKeysById = {
+    for apiKey in coalesce(var.resources.apiKeys, []):
+    "${apiKey.name}-${apiKey.provider}" => apiKey
+    if var.create_api_keys && coalesce(apiKey.provider, "gcp") == "gcp"
+  }
+
   # Service accounts
 
   serviceAccounts = (

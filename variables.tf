@@ -241,9 +241,13 @@ variable "resources" {
     })))
 
     apiKeys = optional(list(object({
+      provider = optional(string)
       name = string
-      services = list(string)
-      origins = list(string)
+      origins = optional(list(string))
+      services = list(object({
+        name = string
+        methods = optional(list(string))
+      }))
     })))
 
     ingress = optional(object({

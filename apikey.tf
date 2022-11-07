@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Taito United
+ * Copyright 2022 Taito United
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,23 @@
  * limitations under the License.
  */
 
-terraform {
-  required_providers {
-    google = {
-      source = "hashicorp/google"
-      version = ">=4.42.1"
+resource "google_apikeys_key" "api_key" {
+  for_each  = {for item in local.apiKeysById: item.id => item}
+
+  name         = each.value.name
+  display_name = each.value.name
+
+  restrictions {
+    dynamic "api_targets" {
+      for_each = {for item in each.value.services: item.name => item}
+      content {
+        service = api_targets.value.name
+        methods = coalesce(api_targets.value.methods, ["GET*"])
+      }
+    }
+
+    browser_key_restrictions {
+      allowed_referrers = coalesce(each.value.origins, [])
     }
   }
-
-  required_version = ">= 1.3.0"
 }

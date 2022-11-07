@@ -14,11 +14,12 @@ alerts:
       resource.labels.namespace_name="my-project-prod"
       severity>=ERROR
 
-# TODO: implement API keys once they are available in Terraform provider
 apiKeys:
   - name: my-project-prod-client
-    services: [ "maps.googleapis.com" ]
     origins: [ "https://myproject.mydomain.com" ]
+    services:
+      - name: maps.googleapis.com
+        methods: ["GET*"]
 
 serviceAccounts:
   - id: my-project-prod-server

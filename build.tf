@@ -16,7 +16,6 @@
 
 resource "google_cloudbuild_trigger" "cicd_trigger" {
   count    = var.create_build_trigger ? 1 : 0
-  provider = google-beta
 
   project  = local.cicd_project_id
   name     = "${var.project}-${var.env}"
