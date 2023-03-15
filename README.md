@@ -108,6 +108,7 @@ services:
       - allowedOrigins:
         - https://myproject.mydomain.com
         - https://www.myproject.mydomain.com
+        allowedMethods: ["GET", "HEAD", "PUT"]
     queues: # TODO: implement
       - name: my-bucket-prod
         events:
