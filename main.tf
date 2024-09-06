@@ -27,15 +27,15 @@ locals {
   project_id           = var.project_id
 
   cicd_project_id = (
-    var.cicd_project_id != "" ? var.cicd_project_id : var.project_id
+    var.cicd_project_id != null && var.cicd_project_id != "" ? var.cicd_project_id : var.project_id
   )
 
   log_alert_project_id = (
-    var.log_alert_project_id != "" ? var.log_alert_project_id : var.project_id
+    var.log_alert_project_id != null && var.log_alert_project_id != "" ? var.log_alert_project_id : var.project_id
   )
 
   uptime_project_id = (
-    var.uptime_project_id != "" ? var.uptime_project_id : var.project_id
+    var.uptime_project_id != null && var.uptime_project_id != "" ? var.uptime_project_id : var.project_id
   )
 
   # API keys

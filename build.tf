@@ -20,6 +20,8 @@ resource "google_cloudbuild_trigger" "cicd_trigger" {
   project  = local.cicd_project_id
   name     = "${var.project}-${var.env}"
 
+  service_account = google_service_account.cloudbuild_service_account[0].id
+
   github {
     owner    = var.vc_organization
     name     = var.vc_repository
@@ -36,4 +38,26 @@ resource "google_cloudbuild_trigger" "cicd_trigger" {
   */
 
   filename = "cloudbuild.yaml"
+}
+
+resource "google_service_account" "cloudbuild_service_account" {
+  count    = var.create_build_trigger ? 1 : 0
+
+  account_id = "cloudbuild-sa"
+}
+
+resource "google_project_iam_member" "act_as" {
+  count    = var.create_build_trigger ? 1 : 0
+
+  project = var.project_id
+  role    = "roles/iam.serviceAccountUser"
+  member  = "serviceAccount:${google_service_account.cloudbuild_service_account[0].email}"
+}
+
+resource "google_project_iam_member" "logs_writer" {
+  count    = var.create_build_trigger ? 1 : 0
+
+  project = var.project_id
+  role    = "roles/logging.logWriter"
+  member  = "serviceAccount:${google_service_account.cloudbuild_service_account[0].email}"
 }
