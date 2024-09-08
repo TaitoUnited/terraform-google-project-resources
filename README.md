@@ -142,6 +142,7 @@ With `create_*` variables you can choose which resources are created/updated in 
 
 ```
   create_build_trigger           = true
+  create_cicd_service_account    = true
   create_storage_buckets         = true
   create_databases               = true
   create_in_memory_databases     = true
