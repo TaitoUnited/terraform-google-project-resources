@@ -20,7 +20,7 @@ resource "google_cloudbuild_trigger" "cicd_trigger" {
   project  = local.cicd_project_id
   name     = "${var.project}-${var.env}"
 
-  service_account = google_service_account.cloudbuild_service_account[0].id
+  service_account = google_service_account.cicd_service_account[0].id
 
   github {
     owner    = var.vc_organization
@@ -41,49 +41,48 @@ resource "google_cloudbuild_trigger" "cicd_trigger" {
   filename = "cloudbuild.yaml"
 }
 
-resource "google_service_account" "cloudbuild_service_account" {
-  count    = var.create_build_trigger ? 1 : 0
+resource "google_service_account" "cicd_service_account" {
+  count    = var.create_cicd_service_account ? 1 : 0
 
   account_id = "${var.project}-${var.env}-cicd"
 }
 
 resource "google_project_iam_member" "act_as" {
-  count    = var.create_build_trigger ? 1 : 0
+  count    = var.create_cicd_service_account ? 1 : 0
 
   project = var.project_id
   role    = "roles/iam.serviceAccountUser"
-  member  = "serviceAccount:${google_service_account.cloudbuild_service_account[0].email}"
+  member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }
 
 resource "google_project_iam_member" "cloudbuild_builder" {
-  count    = var.create_build_trigger ? 1 : 0
+  count    = var.create_cicd_service_account ? 1 : 0
 
   project = var.project_id
   role    = "roles/cloudbuild.builds.builder"
-  member  = "serviceAccount:${google_service_account.cloudbuild_service_account[0].email}"
+  member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }
 
 resource "google_project_iam_member" "logs_writer" {
-  count    = var.create_build_trigger ? 1 : 0
+  count    = var.create_cicd_service_account ? 1 : 0
 
   project = var.project_id
   role    = "roles/logging.logWriter"
-  member  = "serviceAccount:${google_service_account.cloudbuild_service_account[0].email}"
+  member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }
 
 resource "google_project_iam_member" "cloudsql_client" {
-  count    = var.create_build_trigger ? 1 : 0
+  count    = var.create_cicd_service_account ? 1 : 0
 
   project = var.project_id
   role    = "roles/cloudsql.client"
-  member  = "serviceAccount:${google_service_account.cloudbuild_service_account[0].email}"
+  member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }
 
-/* TODO: limit access to the specific kubernetes namespace only */
-resource "google_project_iam_member" "container_developer" {
-  count    = var.create_build_trigger ? 1 : 0
+resource "google_project_iam_member" "container_cluster_viewer" {
+  count    = var.create_cicd_service_account ? 1 : 0
 
   project = var.project_id
-  role    = "roles/container.developer"
-  member  = "serviceAccount:${google_service_account.cloudbuild_service_account[0].email}"
+  role    = "roles/container.clusterViewer"
+  member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }

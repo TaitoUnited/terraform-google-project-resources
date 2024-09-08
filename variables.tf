@@ -33,7 +33,13 @@
 variable "create_build_trigger" {
   type        = bool
   default     = false
-  description = "If true, build trigger will be created."
+  description = "If true, build trigger will be created. If you enable this, you must also enable create_cicd_service_account."
+}
+
+variable "create_cicd_service_account" {
+  type        = bool
+  default     = false
+  description = "If true, ci/cd service account will be created."
 }
 
 variable "create_storage_buckets" {
