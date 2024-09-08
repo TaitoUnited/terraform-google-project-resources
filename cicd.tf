@@ -47,15 +47,17 @@ resource "google_service_account" "cicd_service_account" {
   account_id = "${var.project}-${var.env}-cicd"
 }
 
-resource "google_project_iam_member" "act_as" {
+/* TODO: do we need to enable the iam.serviceAccountUser role in some cases?
+resource "google_project_iam_member" "cicd_service_account_user" {
   count    = var.create_cicd_service_account ? 1 : 0
 
   project = var.project_id
   role    = "roles/iam.serviceAccountUser"
   member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }
+*/
 
-resource "google_project_iam_member" "cloudbuild_builder" {
+resource "google_project_iam_member" "cicd_cloudbuild_builder" {
   count    = var.create_cicd_service_account ? 1 : 0
 
   project = var.project_id
@@ -63,7 +65,7 @@ resource "google_project_iam_member" "cloudbuild_builder" {
   member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }
 
-resource "google_project_iam_member" "logs_writer" {
+resource "google_project_iam_member" "cicd_logs_writer" {
   count    = var.create_cicd_service_account ? 1 : 0
 
   project = var.project_id
@@ -71,7 +73,7 @@ resource "google_project_iam_member" "logs_writer" {
   member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }
 
-resource "google_project_iam_member" "cloudsql_client" {
+resource "google_project_iam_member" "cicd_cloudsql_client" {
   count    = var.create_cicd_service_account ? 1 : 0
 
   project = var.project_id
@@ -79,7 +81,7 @@ resource "google_project_iam_member" "cloudsql_client" {
   member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }
 
-resource "google_project_iam_member" "container_cluster_viewer" {
+resource "google_project_iam_member" "cicd_container_cluster_viewer" {
   count    = var.create_cicd_service_account ? 1 : 0
 
   project = var.project_id
