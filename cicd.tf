@@ -44,6 +44,7 @@ resource "google_cloudbuild_trigger" "cicd_trigger" {
 resource "google_service_account" "cicd_service_account" {
   count    = var.create_cicd_service_account ? 1 : 0
 
+  project  = local.cicd_project_id
   account_id = "${var.project}-${var.env}-cicd"
 }
 
@@ -51,7 +52,7 @@ resource "google_service_account" "cicd_service_account" {
 resource "google_project_iam_member" "cicd_service_account_user" {
   count    = var.create_cicd_service_account ? 1 : 0
 
-  project = var.project_id
+  project  = local.cicd_project_id
   role    = "roles/iam.serviceAccountUser"
   member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }
@@ -60,7 +61,7 @@ resource "google_project_iam_member" "cicd_service_account_user" {
 resource "google_project_iam_member" "cicd_cloudbuild_builder" {
   count    = var.create_cicd_service_account ? 1 : 0
 
-  project = var.project_id
+  project  = local.cicd_project_id
   role    = "roles/cloudbuild.builds.builder"
   member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }
@@ -68,7 +69,7 @@ resource "google_project_iam_member" "cicd_cloudbuild_builder" {
 resource "google_project_iam_member" "cicd_logs_writer" {
   count    = var.create_cicd_service_account ? 1 : 0
 
-  project = var.project_id
+  project  = local.cicd_project_id
   role    = "roles/logging.logWriter"
   member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }
@@ -76,7 +77,7 @@ resource "google_project_iam_member" "cicd_logs_writer" {
 resource "google_project_iam_member" "cicd_cloudsql_client" {
   count    = var.create_cicd_service_account ? 1 : 0
 
-  project = var.project_id
+  project  = local.cicd_project_id
   role    = "roles/cloudsql.client"
   member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }
@@ -84,7 +85,7 @@ resource "google_project_iam_member" "cicd_cloudsql_client" {
 resource "google_project_iam_member" "cicd_container_cluster_viewer" {
   count    = var.create_cicd_service_account ? 1 : 0
 
-  project = var.project_id
+  project  = local.cicd_project_id
   role    = "roles/container.clusterViewer"
   member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }
