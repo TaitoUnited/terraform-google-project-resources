@@ -26,7 +26,6 @@ auth:
   serviceAccounts:
     - name: my-project-prod-server
     - name: my-project-prod-worker
-      # TODO: implement roles with google_project_iam_member
       roles: [ "roles/cloudkms.publicKeyViewer" ]
 
 ingress:

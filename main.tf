@@ -54,6 +54,22 @@ locals {
     if var.create_service_accounts && coalesce(acc.provider, "gcp") == "gcp"
   }
 
+  serviceAccountRoles = flatten([
+    for id, serviceAccount in local.serviceAccountsById: [
+      for role in serviceAccount.roles:
+      {
+        id = id
+        role = role
+        serviceAccount = serviceAccount
+      }
+    ]
+  ])
+
+  serviceAccountRolesByKey = {
+    for r in local.serviceAccountRoles:
+    "${r.id}-${r.role}" => r
+  }
+
   # Alerts
 
   origAlerts = coalesce(var.resources.alerts, [])
