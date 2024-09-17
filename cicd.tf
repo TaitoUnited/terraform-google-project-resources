@@ -20,7 +20,7 @@ resource "google_cloudbuild_trigger" "cicd_trigger" {
   project  = local.cicd_project_id
   name     = "${var.project}-${var.env}"
 
-  service_account = google_service_account.cicd_service_account[0].id
+  service_account = var.create_cicd_service_account ? google_service_account.cicd_service_account[0].id : null
 
   github {
     owner    = var.vc_organization
