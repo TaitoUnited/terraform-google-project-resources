@@ -90,6 +90,17 @@ resource "google_project_iam_member" "cicd_container_cluster_viewer" {
   member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }
 
+resource "google_artifact_registry_repository_iam_member" "cicd_artifact_registry_reader" {
+  count    = var.create_cicd_service_account && var.create_container_image_repositories ? 1 : 0
+
+  project = google_artifact_registry_repository.container-repository[0].project
+  location = google_artifact_registry_repository.container-repository[0].location
+  repository = google_artifact_registry_repository.container-repository[0].name
+
+  role    = "roles/artifactregistry.reader"
+  member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
+}
+
 resource "google_artifact_registry_repository_iam_member" "cicd_artifact_registry_writer" {
   count    = var.create_cicd_service_account && var.create_container_image_repositories ? 1 : 0
 
