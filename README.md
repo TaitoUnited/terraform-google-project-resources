@@ -140,18 +140,19 @@ services:
 With `create_*` variables you can choose which resources are created/updated in which phase. For example, you can choose to update some of the resources manually when the environment is created or updated:
 
 ```
-  create_build_trigger           = true
-  create_cicd_service_account    = true
-  create_storage_buckets         = true
-  create_databases               = true
-  create_in_memory_databases     = true
-  create_topics                  = true
-  create_service_accounts        = true
-  create_service_account_roles   = true
-  create_api_keys                = true
-  create_uptime_checks           = true
-  create_log_alert_metrics       = true
-  create_log_alert_policies      = true
+  create_container_image_repositories = true
+  create_build_trigger                = true
+  create_cicd_service_account         = true
+  create_storage_buckets              = true
+  create_databases                    = true
+  create_in_memory_databases          = true
+  create_topics                       = true
+  create_service_accounts             = true
+  create_service_account_roles        = true
+  create_api_keys                     = true
+  create_uptime_checks                = true
+  create_log_alert_metrics            = true
+  create_log_alert_policies           = true
 ```
 
 And choose to update ingress, containers, and functions on every deployment in your CI/CD pipeline:

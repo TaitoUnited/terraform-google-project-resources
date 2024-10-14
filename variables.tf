@@ -127,12 +127,19 @@ variable "create_log_alert_policies" {
   description = "If true, alert policies are created for log alerts"
 }
 
-# NOTE: NOT SUPPORTED BY THE GOOGLE MODULE
-# variable "create_container_image_repositories" {
-#   type        = bool
-#   default     = false
-#   description = "If true, container image repositories are created."
-# }
+variable "create_container_image_repositories" {
+  type        = bool
+  default     = false
+  description = "If true, container image repositories are created."
+}
+
+# Infra
+
+variable "infra_project_id" {
+  type        = string
+  default     = ""
+  description = "Google Cloud project id for shared infrastructure. If not set, var.project_id will be used by default. The project should already exist."
+}
 
 # Project
 
@@ -197,7 +204,7 @@ variable "vc_branch" {
 variable "cicd_project_id" {
   type        = string
   default     = ""
-  description = "Google Cloud project id for CI/CD (Cloud Build). If not set, var.project_id will be used by default. The project should already exist."
+  description = "Google Cloud project id for CI/CD. If not set, var.project_id will be used by default. The project should already exist."
 }
 
 # Logging settings
