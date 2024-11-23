@@ -207,6 +207,14 @@ variable "cicd_project_id" {
   description = "Google Cloud project id for CI/CD. If not set, var.project_id will be used by default. The project should already exist."
 }
 
+# Container registry settings
+
+variable "registry_immutable_tags" {
+  type        = bool
+  default     = true
+  description = "If true, container registry tags are immutable. This may cause problems if you use the latest tag for something."
+}
+
 # Logging settings
 
 variable "log_alert_project_id" {
