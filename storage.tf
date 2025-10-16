@@ -44,6 +44,10 @@ resource "google_storage_bucket" "bucket" {
     enabled = each.value.versioningEnabled
   }
 
+  hierarchical_namespace {
+    enabled = each.value.hierarchicalNamespaceEnabled
+  }
+
   # transition
   dynamic "lifecycle_rule" {
     for_each = (

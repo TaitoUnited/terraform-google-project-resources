@@ -304,6 +304,7 @@ variable "resources" {
         events = list(string)
       })))
       versioningEnabled = optional(bool)
+      hierarchicalNamespaceEnabled = optional(bool)
       versioningRetainDays = optional(number)
       lockRetainDays = optional(number)
       transitionRetainDays = optional(number)
@@ -340,4 +341,12 @@ variable "resources" {
     })))
   })
   description = "Resources as JSON (see README.md). You can read values from a YAML file with yamldecode()."
+
+  validation {
+    condition = alltrue([
+      for service_key, service in try(var.resources.services, {}) :
+      !(try(service.hierarchicalNamespaceEnabled, false) && try(service.versioningEnabled, false))
+    ])
+    error_message = "Hierarchical namespace and versioning cannot both be enabled on the same service/bucket."
+  }
 }
