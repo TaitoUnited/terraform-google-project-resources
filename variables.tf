@@ -304,7 +304,7 @@ variable "resources" {
         events = list(string)
       })))
       versioningEnabled = optional(bool)
-      hierarchicalNamespaceEnabled = optional(bool)
+      hierarchicalNamespaceEnabled = optional(bool, false)
       versioningRetainDays = optional(number)
       lockRetainDays = optional(number)
       transitionRetainDays = optional(number)
