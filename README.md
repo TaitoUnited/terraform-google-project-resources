@@ -113,6 +113,11 @@ services:
         events:
           - ...
           - ...
+    # Access
+    uniformBucketLevelAccessEnabled: true
+    publicAccessPreventionEnabled: true
+    # Special
+    hierarchicalNamespaceEnabled: false
     # Object lifecycle
     versioningEnabled: true
     versioningRetainDays: 60

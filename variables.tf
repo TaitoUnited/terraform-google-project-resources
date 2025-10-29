@@ -305,6 +305,8 @@ variable "resources" {
       })))
       versioningEnabled = optional(bool)
       hierarchicalNamespaceEnabled = optional(bool, false)
+      uniformBucketLevelAccessEnabled = optional(bool, true)
+      publicAccessPreventionEnabled = optional(bool, true)
       versioningRetainDays = optional(number)
       lockRetainDays = optional(number)
       transitionRetainDays = optional(number)
