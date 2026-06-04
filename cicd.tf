@@ -38,7 +38,7 @@ resource "google_cloudbuild_trigger" "cicd_trigger" {
   }
   */
 
-  filename = "cloudbuild.yaml"
+  filename = coalesce(var.cicd_file_path, "cloudbuild.yaml")
 }
 
 resource "google_service_account" "cicd_service_account" {

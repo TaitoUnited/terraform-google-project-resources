@@ -207,6 +207,12 @@ variable "cicd_project_id" {
   description = "Google Cloud project id for CI/CD. If not set, var.project_id will be used by default. The project should already exist."
 }
 
+variable "cicd_file_path" {
+  type        = string
+  default     = ""
+  description = "File path for Google Cloud Build cloudbuild.yaml. If not set, 'cloudbuild.yaml' will be used as default."
+}
+
 # Container registry settings
 
 variable "registry_immutable_tags" {
