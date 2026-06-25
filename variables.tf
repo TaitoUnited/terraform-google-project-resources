@@ -213,6 +213,18 @@ variable "cicd_file_path" {
   description = "File path for Google Cloud Build cloudbuild.yaml. If not set, 'cloudbuild.yaml' will be used as default."
 }
 
+variable "cicd_included_files" {
+  type        = list(string)
+  default     = []
+  description = "File paths that trigger CI/CD build."
+}
+
+variable "cicd_ignored_files" {
+  type        = list(string)
+  default     = []
+  description = "File paths that do not trigger CI/CD build."
+}
+
 # Container registry settings
 
 variable "registry_immutable_tags" {

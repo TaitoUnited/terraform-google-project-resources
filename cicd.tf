@@ -39,6 +39,9 @@ resource "google_cloudbuild_trigger" "cicd_trigger" {
   */
 
   filename = coalesce(var.cicd_file_path, "cloudbuild.yaml")
+
+  included_files = var.cicd_included_files
+  ignored_files = var.cicd_ignored_files
 }
 
 resource "google_service_account" "cicd_service_account" {
