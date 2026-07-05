@@ -260,6 +260,13 @@ variable "uptime_channels" {
   description = "SNS topics used to send alert notifications (e.g. \"arn:aws:sns:us-east-1:0123456789:my-zone-uptimez\")"
 }
 
+# Certificate
+
+variable "certificate_map" {
+  type = string
+  description = "If not empty, a certificate is created for each domain and added to this certificate map"
+}
+
 # Resources as a json/yaml
 
 variable "resources" {
