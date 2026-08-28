@@ -214,7 +214,7 @@ variable "cicd_file_path" {
 }
 
 variable "cicd_location" {
-  type        = list(string)
+  type        = string
   default     = "global"
   description = "CI/CD location"
 }
