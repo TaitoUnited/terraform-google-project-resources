@@ -213,6 +213,12 @@ variable "cicd_file_path" {
   description = "File path for Google Cloud Build cloudbuild.yaml. If not set, 'cloudbuild.yaml' will be used as default."
 }
 
+variable "cicd_location" {
+  type        = list(string)
+  default     = "global"
+  description = "CI/CD location"
+}
+
 variable "cicd_included_files" {
   type        = list(string)
   default     = []
