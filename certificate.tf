@@ -17,7 +17,7 @@
 resource "google_certificate_manager_certificate" "certificate" {
   for_each   = {for item in (var.certificate_map != "" ? local.allDomainNames : []): item => item}
 
-  name    = each.value
+  name     = replace(each.value, ".", "-")
   location = "global"
 
   managed {
@@ -30,7 +30,7 @@ resource "google_certificate_manager_certificate" "certificate" {
 resource "google_certificate_manager_certificate_map_entry" "certificate" {
   for_each   = {for item in (var.certificate_map != "" ? local.allDomainNames : []): item => item}
   
-  name       = each.value
+  name       = replace(each.value, ".", "-")
   hostname   = each.value
   map        = var.certificate_map
 
