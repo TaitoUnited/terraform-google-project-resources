@@ -100,12 +100,12 @@ locals {
 
   domains = coalesce(var.resources.ingress.domains, [])
 
-  allDomainNames = flatten([
+  allDomainNames = compact(flatten([
     for domain in local.domains : concat(
       [domain.name],
       [for alt in domain.altDomains : alt.name]
     )
-  ])
+  ]))
 
   mainDomains = [
     for domain in local.domains:
