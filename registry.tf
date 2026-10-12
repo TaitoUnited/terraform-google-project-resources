@@ -17,7 +17,7 @@
 resource "google_artifact_registry_repository" "container-repository" {
   count         = var.create_container_image_repositories ? 1 : 0
 
-  project       = var.infra_project_id
+  project       = local.container_registry_project_id
   repository_id = var.project
   location      = var.region
   format        = "DOCKER"
@@ -30,7 +30,7 @@ resource "google_artifact_registry_repository" "container-repository" {
 data "google_artifact_registry_repository" "container-repository" {
   count         = !var.create_cicd_service_account || var.create_container_image_repositories ? 0 : 1
 
-  project       = var.infra_project_id
+  project       = local.container_registry_project_id
   repository_id = var.project
   location      = var.region
 }

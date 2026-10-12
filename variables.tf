@@ -141,6 +141,12 @@ variable "infra_project_id" {
   description = "Google Cloud project id for shared infrastructure. If not set, var.project_id will be used by default. The project should already exist."
 }
 
+variable "container_registry_project_id" {
+  type        = string
+  default     = ""
+  description = "Google Cloud project id for shared container registry. If not set, var.project_id will be used by default. The project should already exist."
+}
+
 # Project
 
 variable "project" {
