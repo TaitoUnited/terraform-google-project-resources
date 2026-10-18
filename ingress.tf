@@ -61,20 +61,20 @@ resource "google_compute_url_map" "app" {
 resource "google_compute_backend_service" "container" {
   for_each              = local.containersWithPathById
 
-  name                  = "${var.project}-${each.key}-${var.env}-backend"
+  name                  = "${var.project}-${var.env}-${each.key}"
   protocol              = "HTTP"
   load_balancing_scheme = "EXTERNAL_MANAGED"
 
   backend {
-    group = google_compute_region_network_endpoint_group.container-neg[each.key].id
+    group = google_compute_region_network_endpoint_group.container[each.key].id
   }
 }
 
 # Serverless NEGs connect the load balancer to Cloud Run
-resource "google_compute_region_network_endpoint_group" "container-neg" {
+resource "google_compute_region_network_endpoint_group" "container" {
   for_each              = local.containersWithPathById
 
-  name                  = "${var.project}-${each.key}-${var.env}-neg"
+  name                  = "${var.project}-${var.env}-${each.key}"
   region                = var.region
   network_endpoint_type = "SERVERLESS"
 

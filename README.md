@@ -84,6 +84,16 @@ services:
       REDIS_HOST: my-project-prod-001.my-project-prod.nde1c2.use1.cache.amazonaws.com
       REDIS_PORT: 6379
       STORAGE_BUCKET: my-project-prod
+    cronJobs:
+      daily:
+        schedule: "0 0 * * *"
+        timeZone: Europe/Helsinki
+        shellCommand: ./cli.sh daily
+        env:
+          ERP_URL: https://myerp.com
+          ERP_USERNAME: erp
+        secretEnv:
+          ERP_PASSWORD: my-project-prod-erp.password
 
   worker:
     type: container # TODO: implement

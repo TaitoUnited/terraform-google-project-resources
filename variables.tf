@@ -425,6 +425,7 @@ variable "resources" {
       runtime = optional(string)
       memoryRequest = optional(number)
       secrets = optional(map(string))
+      secretEnv = optional(map(string))
       env = optional(map(string))
       publishers = optional(list(object({
         id = string
@@ -432,6 +433,15 @@ variable "resources" {
       subscribers = optional(list(object({
         id = string
       })))
+
+      cronJobs = optional(map(object({
+        schedule = string
+        timeZone = optional(string)
+        shellCommand = string
+        env = optional(map(string))
+        secretEnv = optional(map(string))
+      })))
+
     })))
   })
   description = "Resources as JSON (see README.md). You can read values from a YAML file with yamldecode()."

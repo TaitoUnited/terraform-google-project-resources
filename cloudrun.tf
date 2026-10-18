@@ -17,8 +17,8 @@
 resource "google_service_account" "container" {
   for_each     = local.containersById
 
-  account_id   = "${var.project}-${each.key}-${var.env}"
-  display_name = "${var.project}-${each.key}-${var.env}"
+  account_id   = "${var.project}-${var.env}-${each.key}"
+  display_name = "${var.project}-${var.env}-${each.key}"
 
   depends_on   = [module.admin.apis]
 }
@@ -33,8 +33,8 @@ resource "google_secret_manager_secret_iam_member" "container" {
 
 resource "google_cloud_run_v2_service" "container" {
   for_each      = local.containersById
-  name          = "${var.project}-${each.key}-${var.env}"
-  location      = each.value.location
+  name          = "${var.project}-${var.env}-${each.key}"
+  location      = var.region
 
   # Allow traffic through the external Application Load Balancer,
   # not directly through the default run.app URL.
@@ -134,5 +134,114 @@ resource "google_cloud_run_v2_service" "container" {
 
   depends_on = [
     module.admin.apis,
+  ]
+}
+
+/* ---- Cron job ----- */
+
+resource "google_cloud_run_v2_job" "cronjob" {
+  for_each      = local.containerCronJobsById
+  name          = "${var.project}-${var.env}-${each.key}"
+  location      = var.region
+
+  deletion_protection = false
+
+  template {
+    template {
+      service_account = google_service_account.container[each.value.container.id].email
+
+      containers {
+        image = each.value.container.image
+
+        command = ["sh", "-c", each.value.shellCommand]
+
+        dynamic "env" {
+          for_each = merge(each.value.container.env, each.value.env)
+
+          content {
+            name  = env.key
+            value = env.value
+          }
+        }
+
+        dynamic "env" {
+          for_each = merge(each.value.container.secretEnv, each.value.secretEnv)
+
+          content {
+            name = env.key
+
+            value_source {
+              secret_key_ref {
+                secret  = env.value
+                version = "latest"
+              }
+            }
+          }
+        }
+
+        resources {
+          limits = {
+            cpu    = coalesce(each.value.cpuLimit, each.value.container.cpuLimit, "1")
+            memory = coalesce(each.value.memoryLimit, each.value.container.memoryLimit, "512Mi")
+          }
+        }
+      }
+
+      vpc_access {
+        egress = "PRIVATE_RANGES_ONLY"
+
+        network_interfaces {
+          network    = var.private_network_id
+          subnetwork = var.private_container_subnetwork_id
+        }
+      }
+    }
+  }
+
+  depends_on = [
+    module.admin.apis,
+  ]
+}
+
+resource "google_service_account" "scheduler" {
+  for_each      = local.containerCronJobsById
+
+  account_id   = "${var.project}-${var.env}-${each.key}"
+  display_name = "${var.project}-${var.env}-${each.key}"
+
+  depends_on   = [module.admin.apis]
+}
+
+resource "google_cloud_run_v2_job_iam_member" "scheduler" {
+  for_each      = local.containerCronJobsById
+
+  location = var.region
+  name     = google_cloud_run_v2_job.cronjob[each.key].name
+
+  role   = "roles/run.invoker"
+  member = "serviceAccount:${google_service_account.scheduler[each.key].email}"
+}
+
+resource "google_cloud_scheduler_job" "cronjob" {
+  for_each    = local.containerCronJobsById
+  name        = "${var.project}-${var.env}-${each.key}"
+  region      = var.region
+
+  schedule    = each.value.schedule
+  time_zone   = coalesce(each.value.timeZone, "Etc/UTC")
+
+  http_target {
+    http_method = "POST"
+
+    uri = "https://run.googleapis.com/v2/projects/${var.project_id}/locations/${var.region}/jobs/${google_cloud_run_v2_job.cronjob[each.key].name}:run"
+
+    oauth_token {
+      service_account_email = google_service_account.scheduler[each.key].email
+    }
+  }
+
+  depends_on = [
+    module.admin.apis,
+    google_cloud_run_v2_job_iam_member.scheduler
   ]
 }

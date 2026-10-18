@@ -134,7 +134,7 @@ locals {
 
   containersById = {
     for name, service in local.servicesById:
-    name => service
+    name => merge(service, { id = name })
     if var.create_containers && service.type == "container"
   }
 
@@ -150,6 +150,15 @@ locals {
         }
       ]
     ]) : secret.id => secret
+  }
+
+  containerCronJobsById = {
+    for cronjob in flatten([
+      for containerId, container in local.containersById: [
+        for name, spec in container.cronJobs:
+        merge(spec, { id = "${containerId}-${name}", name = name, container = container })
+      ]
+    ]) : cronjob.id => cronjob
   }
 
   containersWithPathById = {
