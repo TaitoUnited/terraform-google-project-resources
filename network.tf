@@ -29,6 +29,6 @@ resource "google_compute_subnetwork" "container" {
   name                     = var.private_container_subnetwork_id
   region                   = var.region
   network                  = google_compute_network.vpc[0].id
-  ip_cidr_range            = "10.10.0.0/22"
+  ip_cidr_range            = "10.20.0.0/24"
   private_ip_google_access = true
 }

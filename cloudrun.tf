@@ -38,7 +38,10 @@ resource "google_cloud_run_v2_service" "container" {
 
   # Allow traffic through the external Application Load Balancer,
   # not directly through the default run.app URL.
-  ingress = "INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER"
+  ingress  = length(each.value.paths) == 0 ? "INGRESS_TRAFFIC_INTERNAL_ONLY" : "INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER"
+
+  # Simplify calls made to internal service by not requiring google-signed token
+  invoker_iam_disabled = length(each.value.paths) == 0
 
   deletion_protection = false
 
@@ -62,6 +65,7 @@ resource "google_cloud_run_v2_service" "container" {
         }
       }
 
+      # Populate secrets defined in secretEnv as environment variables
       dynamic "env" {
         for_each = each.value.secretEnv
 
@@ -74,6 +78,21 @@ resource "google_cloud_run_v2_service" "container" {
               version = "latest"
             }
           }
+        }
+      }
+
+      # Populate cloud run service urls of other services as environment variables
+      dynamic "env" {
+        for_each = {
+          for key, container in local.containersById :
+          key => container
+          if key != each.key
+        }        
+        iterator = target
+
+        content {
+          name  = "${upper(replace(target.key, "-", "_"))}_URL"
+          value = google_cloud_run_v2_service.container[target.key].uri
         }
       }
 
