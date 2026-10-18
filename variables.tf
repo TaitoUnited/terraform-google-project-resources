@@ -366,6 +366,10 @@ variable "resources" {
       name        = optional(string)
       location    = optional(string)
 
+      paths = optional(list(object({
+        path = string
+      })))
+
       # For databases
       zone                       = optional(string)
       cmekLocation               = optional(string)

@@ -38,10 +38,10 @@ resource "google_cloud_run_v2_service" "container" {
 
   # Allow traffic through the external Application Load Balancer,
   # not directly through the default run.app URL.
-  ingress = length(each.value.paths) == 0 ? "INGRESS_TRAFFIC_INTERNAL_ONLY" : "INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER"
+  ingress = length(coalesce(try(each.value.paths, null), [])) == 0 ? "INGRESS_TRAFFIC_INTERNAL_ONLY" : "INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER"
 
   # Simplify calls made to internal service by not requiring google-signed token
-  invoker_iam_disabled = length(each.value.paths) == 0
+  invoker_iam_disabled = length(coalesce(try(each.value.paths, null), [])) == 0
 
   deletion_protection = false
 
@@ -67,7 +67,7 @@ resource "google_cloud_run_v2_service" "container" {
 
       # Populate secrets defined in secretEnv as environment variables
       dynamic "env" {
-        for_each = each.value.secretEnv
+        for_each = coalesce(try(each.value.secretEnv, null), {})
 
         content {
           name = env.key
@@ -107,10 +107,10 @@ resource "google_cloud_run_v2_service" "container" {
 
       # Check whether the application has started successfully.
       dynamic "startup_probe" {
-        for_each = each.value.livenessDisabled ? [] : [1]
+        for_each = try(each.value.livenessDisabled, false) ? [] : [1]
         content {
           http_get {
-            path = coalesce(each.value.livenessPath, "/healthz")
+            path = coalesce(try(each.value.livenessPath, null), "/healthz")
           }
 
           # TODO: make configurable
@@ -123,10 +123,10 @@ resource "google_cloud_run_v2_service" "container" {
 
       # Restart the container if it becomes unhealthy.
       dynamic "liveness_probe" {
-        for_each = each.value.livenessDisabled ? [] : [1]
+        for_each = try(each.value.livenessDisabled, false) ? [] : [1]
         content {
           http_get {
-            path = coalesce(each.value.livenessPath, "/healthz")
+            path = coalesce(try(each.value.livenessPath, null), "/healthz")
           }
 
           # TODO: make configurable
@@ -148,8 +148,8 @@ resource "google_cloud_run_v2_service" "container" {
     }
 
     scaling {
-      min_instance_count = coalesce(each.value.minReplicas, each.value.replicas)
-      max_instance_count = coalesce(each.value.maxReplicas, each.value.replicas)
+      min_instance_count = coalesce(try(each.value.minReplicas, null), try(each.value.replicas, null), 1)
+      max_instance_count = coalesce(try(each.value.maxReplicas, null), try(each.value.replicas, null), 1)
     }
   }
 

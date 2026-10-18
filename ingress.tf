@@ -38,11 +38,11 @@ resource "google_compute_url_map" "app" {
       for_each = local.containerPathsById
 
       content {
-        service = google_compute_backend_service.container[each.value.containerId].id
+        service = google_compute_backend_service.container[path_rule.value.containerId].id
 
         paths = [
-          "${each.value}",
-          "${each.value}/*",
+          "${path_rule.value.path}",
+          "${path_rule.value.path}/*",
         ]
 
         route_action {
