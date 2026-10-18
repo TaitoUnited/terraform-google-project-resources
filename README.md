@@ -16,6 +16,15 @@ alerts:
       severity>=ERROR
 
 auth:
+  apis:
+    - id: compute.googleapis.com
+    - id: run.googleapis.com
+    - id: secretmanager.googleapis.com
+    - id: vpcaccess.googleapis.com
+    - id: certificatemanager.googleapis.com
+    - id: sqladmin.googleapis.com
+    - id: cloudbuild.googleapis.com
+
   apiKeys:
     - name: my-project-prod-client
       origins: [ "https://myproject.mydomain.com" ]
@@ -27,6 +36,10 @@ auth:
     - name: my-project-prod-server
     - name: my-project-prod-worker
       roles: [ "roles/cloudkms.publicKeyViewer" ]
+
+  permissions:
+    - id: "serviceAccount:xxx@xxx.iam.gserviceaccount.com"
+      roles: ["roles/cloudsql.client"]
 
 ingress:
   class: gateway
@@ -176,7 +189,8 @@ With `create_*` variables you can choose which resources are created/updated in 
   create_in_memory_databases          = true
   create_topics                       = true
   create_service_accounts             = true
-  create_service_account_roles        = true
+  create_permissions                  = true
+  create_apis                         = true
   create_api_keys                     = true
   create_uptime_checks                = true
   create_log_alert_metrics            = true

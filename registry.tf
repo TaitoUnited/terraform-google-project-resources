@@ -15,6 +15,10 @@
  */
 
 resource "google_artifact_registry_repository" "container-repository" {
+  depends_on = [
+    module.admin.apis,
+  ]
+
   count         = var.create_container_image_repositories ? 1 : 0
 
   project       = local.container_registry_project_id

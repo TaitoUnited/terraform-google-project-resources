@@ -15,6 +15,10 @@
  */
 
 resource "google_cloudbuild_trigger" "cicd_trigger" {
+  depends_on = [
+    module.admin.apis,
+  ]
+
   count    = var.create_build_trigger ? 1 : 0
 
   project  = local.cicd_project_id

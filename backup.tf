@@ -19,6 +19,10 @@ data "google_storage_transfer_project_service_account" "backup_bucket_transfer" 
 }
 
 resource "google_storage_bucket" "backup_bucket" {
+  depends_on = [
+    module.admin.apis,
+  ]
+
   for_each      = length(var.backup_days) > 0 ? local.bucketsById : {}
   name          = "${each.value.name}-backup"
   location      = each.value.backupLocation

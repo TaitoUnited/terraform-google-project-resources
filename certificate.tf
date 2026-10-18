@@ -15,6 +15,10 @@
  */
 
 resource "google_certificate_manager_certificate" "certificate" {
+  depends_on = [
+    module.admin.apis,
+  ]
+
   for_each   = {for item in (var.certificate_map != "" ? local.allDomainNames : []): item => item}
 
   name     = replace(each.value, ".", "-")

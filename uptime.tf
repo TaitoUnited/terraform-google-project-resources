@@ -15,6 +15,10 @@
  */
 
 resource "google_monitoring_uptime_check_config" "https" {
+  depends_on = [
+    module.admin.apis,
+  ]
+
   for_each     = local.uptimeTargetsById
   project      = local.uptime_project_id
   selected_regions = var.uptime_regions

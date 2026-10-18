@@ -15,6 +15,10 @@
  */
 
 resource "google_storage_bucket" "bucket" {
+  depends_on = [
+    module.admin.apis,
+  ]
+
   for_each      = local.bucketsById
   name          = each.value.name
   location      = each.value.location
@@ -118,7 +122,7 @@ resource "google_storage_bucket" "bucket" {
 resource "google_storage_bucket_iam_binding" "bucket_admin" {
   depends_on = [
     google_storage_bucket.bucket,
-    google_service_account.service_account,
+    module.admin.service_accounts,
   ]
   for_each = local.bucketsById
   bucket  = each.value.name
@@ -137,7 +141,7 @@ resource "google_storage_bucket_iam_binding" "bucket_admin" {
 resource "google_storage_bucket_iam_binding" "bucket_object_admin" {
   depends_on = [
     google_storage_bucket.bucket,
-    google_service_account.service_account,
+    module.admin.service_accounts,
   ]
   for_each = local.bucketsById
   bucket  = each.value.name
@@ -156,7 +160,7 @@ resource "google_storage_bucket_iam_binding" "bucket_object_admin" {
 resource "google_storage_bucket_iam_binding" "bucket_object_viewer" {
   depends_on = [
     google_storage_bucket.bucket,
-    google_service_account.service_account,
+    module.admin.service_accounts,
   ]
   for_each = local.bucketsById
   bucket  = each.value.name

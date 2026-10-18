@@ -97,16 +97,22 @@ variable "create_service_accounts" {
   description = "If true, service accounts are created."
 }
 
-variable "create_service_account_roles" {
+variable "create_permissions" {
   type        = bool
   default     = false
-  description = "If true, service account IAM permissions are created. (TODO)"
+  description = "If true, permissions are created."
+}
+
+variable "create_apis" {
+  type        = bool
+  default     = false
+  description = "If true, apis are created."
 }
 
 variable "create_api_keys" {
   type        = bool
   default     = false
-  description = "If true, api keys are created. (TODO)"
+  description = "If true, api keys are created."
 }
 
 variable "create_uptime_checks" {
@@ -304,6 +310,17 @@ variable "resources" {
         provider = optional(string)
         name = string
         roles = optional(list(string))
+      })))
+
+      permissions = optional(list(object({
+        provider = optional(string)
+        id = string
+        roles = list(string)
+      })))
+
+      apis = optional(list(object({
+        provider = optional(string)
+        id = string
       })))
 
       apiKeys = optional(list(object({

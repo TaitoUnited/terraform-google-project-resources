@@ -40,36 +40,32 @@ locals {
     var.uptime_project_id != null && var.uptime_project_id != "" ? var.uptime_project_id : var.project_id
   )
 
+  # Admin stuff
+
+  serviceAccountsById = {
+    for item in coalesce(try(var.resources.auth.serviceAccounts, []), []):
+    "${item.name}-${coalesce(item.provider, "gcp")}" => item
+    if var.create_service_accounts && coalesce(item.provider, "gcp") == "gcp"
+  }
+
+  permissionsById = {
+    for item in coalesce(try(var.resources.auth.permissions, []), []):
+    "${item.id}-${coalesce(item.provider, "gcp")}" => item
+    if var.create_permissions && coalesce(item.provider, "gcp") == "gcp"
+  }
+
+  apisById = {
+    for item in coalesce(try(var.resources.auth.apis, []), []):
+    "${item.id}-${coalesce(item.provider, "gcp")}" => item
+    if var.create_apis && coalesce(item.provider, "gcp") == "gcp"
+  }
+
   # API keys
 
   apiKeysById = {
     for apiKey in coalesce(try(var.resources.auth.apiKeys, []), []):
     "${apiKey.name}-${coalesce(apiKey.provider, "gcp")}" => apiKey
     if var.create_api_keys && coalesce(apiKey.provider, "gcp") == "gcp"
-  }
-
-  # Service accounts
-
-  serviceAccountsById = {
-    for acc in coalesce(try(var.resources.auth.serviceAccounts, []), []):
-    "${acc.name}-${coalesce(acc.provider, "gcp")}" => acc
-    if var.create_service_accounts && coalesce(acc.provider, "gcp") == "gcp"
-  }
-
-  serviceAccountRoles = flatten([
-    for id, serviceAccount in local.serviceAccountsById: [
-      for role in serviceAccount.roles:
-      {
-        id = id
-        role = role
-        serviceAccount = serviceAccount
-      }
-    ]
-  ])
-
-  serviceAccountRolesByKey = {
-    for r in local.serviceAccountRoles:
-    "${r.id}-${r.role}" => r
   }
 
   # Alerts
@@ -215,7 +211,22 @@ locals {
 
 }
 
+module "admin" {
+  source           = "TaitoUnited/admin/google"
+  version          = "3.2.0"
+
+  project_id       = local.project_id
+
+  permissions      = values(local.permissionsById)
+  service_accounts = values(local.serviceAccountsById)
+  apis             = values(local.apisById)
+}
+
 module "databases" {
+  depends_on = [
+    module.admin.apis,
+  ]
+
   source              = "TaitoUnited/databases/google"
   version             = "3.3.2"
 

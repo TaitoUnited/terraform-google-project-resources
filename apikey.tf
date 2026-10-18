@@ -15,6 +15,10 @@
  */
 
 resource "google_apikeys_key" "api_key" {
+  depends_on = [
+    module.admin.apis,
+  ]
+
   for_each  = {for item in local.apiKeysById: item.id => item}
 
   name         = each.value.name
