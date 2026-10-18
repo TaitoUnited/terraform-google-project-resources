@@ -181,6 +181,7 @@ services:
 With `create_*` variables you can choose which resources are created/updated in which phase. For example, you can choose to update some of the resources manually when the environment is created or updated:
 
 ```
+  create_domain_certificate           = true
   create_container_image_repositories = true
   create_build_trigger                = true
   create_cicd_service_account         = true

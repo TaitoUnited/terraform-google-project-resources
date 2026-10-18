@@ -23,12 +23,11 @@
 #   description = "If true, a DNS setup is created for each main domain."
 # }
 
-# NOTE: NOT SUPPORTED BY THE GOOGLE MODULE
-# variable "create_domain_certificate" {
-#   type        = bool
-#   default     = false
-#   description = "If true, a domain certificate is created for each domain."
-# }
+variable "create_domain_certificate" {
+  type        = bool
+  default     = false
+  description = "If true, a domain certificate is created for each domain."
+}
 
 variable "create_build_trigger" {
   type        = bool
