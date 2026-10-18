@@ -51,7 +51,7 @@ variable "create_storage_buckets" {
 variable "create_databases" {
   type        = bool
   default     = false
-  description = "If true, databases are created. (TODO)"
+  description = "If true, databases are created."
 }
 
 variable "create_in_memory_databases" {
@@ -174,6 +174,12 @@ variable "region" {
 variable "zone" {
   type        = string
   description = "Google Cloud zone."
+}
+
+variable "private_network_id" {
+  type        = string
+  default     = ""
+  description = "Private network for containers and database connectivity"
 }
 
 # Version control
@@ -329,6 +335,23 @@ variable "resources" {
       machineType = optional(string)
       name = optional(string)
       location = optional(string)
+
+      # For databases
+      zone = optional(string)
+      cmekLocation = optional(string)
+      version = optional(string)
+      edition = optional(string)
+      tier = optional(string)
+      maintenanceDay = optional(number)
+      maintenanceHour = optional(number)
+      backupStartTime = optional(string)
+      pointInTimeRecoveryEnabled = optional(bool)
+      highAvailabilityEnabled = optional(bool)
+      publicIpEnabled = optional(bool)
+      authorizedNetworks = optional(list(string))
+      flags = optional(any)
+      adminUsername = optional(string)
+
       storageClass = optional(string)
       corsRules = optional(list(object({
         allowedOrigins = list(string)

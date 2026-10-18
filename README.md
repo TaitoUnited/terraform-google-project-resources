@@ -140,6 +140,29 @@ services:
       - id: serviceAccount:my-project-prod-worker
     objectViewers:
       - id: user:john.doe@mydomain.com
+
+  database:
+    # postgres or mysql
+    type: postgres
+    name: my-project-postgres
+    # Set cmekLocation only if you want cmek to be enabled for this database instance
+    cmekLocation: europe-west1
+    region: europe-west1
+    zone: europe-west1-b
+    version: POSTGRES_18
+    edition: ENTERPRISE
+    tier: db-custom-1-3840
+    maintenanceDay: 2
+    maintenanceHour: 2
+    backupStartTime: 05:00
+    pointInTimeRecoveryEnabled: true
+    highAvailabilityEnabled: false
+    publicIpEnabled: false
+    authorizedNetworks:
+      - 127.127.127.127/32
+    flags:
+      log_min_duration_statement: 1000
+    adminUsername: admin
 ```
 
 With `create_*` variables you can choose which resources are created/updated in which phase. For example, you can choose to update some of the resources manually when the environment is created or updated:

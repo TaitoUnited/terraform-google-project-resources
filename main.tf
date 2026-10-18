@@ -154,10 +154,16 @@ locals {
   #   if var.create_function_permissions && service.type == "function"
   # }
 
-  databasesById = {
+  postgresDatabasesById = {
     for name, service in local.servicesById:
-    name => service
-    if var.create_databases && (service.type == "pg" || service.type == "mysql")
+    name => merge(service, { region: service.location })
+    if var.create_databases && service.type == "postgres"
+  }
+
+  mysqlDatabasesById = {
+    for name, service in local.servicesById:
+    name => merge(service, { region: service.location })
+    if var.create_databases && service.type == "mysql"
   }
 
   redisDatabasesById = {
@@ -207,4 +213,14 @@ locals {
     values(local.ingressStaticContentsById),
   )) > 0
 
+}
+
+module "databases" {
+  source              = "TaitoUnited/databases/google"
+  version             = "3.3.2"
+
+  postgresql_clusters = values(local.postgresDatabasesById)
+  mysql_clusters      = values(local.mysqlDatabasesById)
+
+  private_network_id  = var.private_network_id
 }
