@@ -69,7 +69,7 @@ resource "google_monitoring_alert_policy" "https" {
         }
         comparison      = "COMPARISON_GT"
         duration        = "60s"
-        filter          = "metric.type=\"monitoring.googleapis.com/uptime_check/check_passed\" resource.type=\"uptime_url\" metric.label.\"check_id\"=\"${var.project}-${var.env}-${conditions.value}\""
+        filter          = "metric.type=\"monitoring.googleapis.com/uptime_check/check_passed\" resource.type=\"uptime_url\" metric.label.\"check_id\"=\"${google_monitoring_uptime_check_config.https[conditions.value].uptime_check_id}\""
         threshold_value = "1.0"
         trigger {
           count = 1
