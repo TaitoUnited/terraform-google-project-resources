@@ -286,21 +286,21 @@ variable "uptime_project_id" {
 }
 
 variable "uptime_regions" {
-  type = list(string)
-  default = ["EUROPE", "USA"]
+  type        = list(string)
+  default     = ["EUROPE", "USA"]
   description = "The list of regions from which the uptime check will be run."
 }
 
 variable "uptime_channels" {
-  type = list(string)
-  default = []
+  type        = list(string)
+  default     = []
   description = "SNS topics used to send alert notifications (e.g. \"arn:aws:sns:us-east-1:0123456789:my-zone-uptimez\")"
 }
 
 # Certificate
 
 variable "certificate_map" {
-  type = string
+  type        = string
   description = "If not empty, a certificate is created for each domain and added to this certificate map"
 }
 
@@ -312,44 +312,44 @@ variable "resources" {
     uptimeEnabled = optional(bool)
 
     alerts = optional(list(object({
-      name = string
-      type = string
+      name     = string
+      type     = string
       channels = list(string)
-      rule = string
+      rule     = string
     })))
 
     auth = optional(object({
       serviceAccounts = optional(list(object({
         provider = optional(string)
-        name = string
-        roles = optional(list(string))
+        name     = string
+        roles    = optional(list(string))
       })))
 
       permissions = optional(list(object({
         provider = optional(string)
-        id = string
-        roles = list(string)
+        id       = string
+        roles    = list(string)
       })))
 
       apis = optional(list(object({
         provider = optional(string)
-        id = string
+        id       = string
       })))
 
       apiKeys = optional(list(object({
         provider = optional(string)
-        name = string
-        origins = optional(list(string))
+        name     = string
+        origins  = optional(list(string))
         services = list(object({
-          name = string
+          name    = string
           methods = optional(list(string))
         }))
       })))
     }))
 
     ingress = optional(object({
-      class = optional(string)
-      enabled = optional(bool)
+      class            = optional(string)
+      enabled          = optional(bool)
       createMainDomain = optional(bool)
       domains = list(object({
         name = string
@@ -360,52 +360,52 @@ variable "resources" {
     }))
 
     services = optional(map(object({
-      type = string
-      image = optional(string)
+      type        = string
+      image       = optional(string)
       machineType = optional(string)
-      name = optional(string)
-      location = optional(string)
+      name        = optional(string)
+      location    = optional(string)
 
       # For databases
-      zone = optional(string)
-      cmekLocation = optional(string)
-      version = optional(string)
-      edition = optional(string)
-      tier = optional(string)
-      maintenanceDay = optional(number)
-      maintenanceHour = optional(number)
-      backupStartTime = optional(string)
+      zone                       = optional(string)
+      cmekLocation               = optional(string)
+      version                    = optional(string)
+      edition                    = optional(string)
+      tier                       = optional(string)
+      maintenanceDay             = optional(number)
+      maintenanceHour            = optional(number)
+      backupStartTime            = optional(string)
       pointInTimeRecoveryEnabled = optional(bool)
-      highAvailabilityEnabled = optional(bool)
-      publicIpEnabled = optional(bool)
-      authorizedNetworks = optional(list(string))
-      flags = optional(any)
-      adminUsername = optional(string)
+      highAvailabilityEnabled    = optional(bool)
+      publicIpEnabled            = optional(bool)
+      authorizedNetworks         = optional(list(string))
+      flags                      = optional(any)
+      adminUsername              = optional(string)
 
       storageClass = optional(string)
       corsRules = optional(list(object({
         allowedOrigins = list(string)
         allowedMethods = optional(list(string))
-        exposeHeaders = optional(list(string))
-        maxAgeSeconds = optional(number)
+        exposeHeaders  = optional(list(string))
+        maxAgeSeconds  = optional(number)
       })))
       queues = optional(list(object({
-        name = string
+        name   = string
         events = list(string)
       })))
-      versioningEnabled = optional(bool)
-      hierarchicalNamespaceEnabled = optional(bool, false)
+      versioningEnabled               = optional(bool)
+      hierarchicalNamespaceEnabled    = optional(bool, false)
       uniformBucketLevelAccessEnabled = optional(bool, true)
-      publicAccessPreventionEnabled = optional(bool, true)
-      versioningRetainDays = optional(number)
-      lockRetainDays = optional(number)
-      transitionRetainDays = optional(number)
-      transitionStorageClass = optional(string)
-      autoDeletionRetainDays = optional(number)
-      replicationBucket = optional(string)
-      backupRetainDays = optional(number)
-      backupLocation = optional(string)
-      backupLock = optional(bool)
+      publicAccessPreventionEnabled   = optional(bool, true)
+      versioningRetainDays            = optional(number)
+      lockRetainDays                  = optional(number)
+      transitionRetainDays            = optional(number)
+      transitionStorageClass          = optional(string)
+      autoDeletionRetainDays          = optional(number)
+      replicationBucket               = optional(string)
+      backupRetainDays                = optional(number)
+      backupLocation                  = optional(string)
+      backupLock                      = optional(bool)
       admins = optional(list(object({
         id = string
       })))
@@ -415,18 +415,18 @@ variable "resources" {
       objectViewers = optional(list(object({
         id = string
       })))
-      replicas = optional(number)
-      minReplicas = optional(number)
-      maxReplicas = optional(number)
-      path = optional(string)
-      uptimePath = optional(string)
+      replicas      = optional(number)
+      minReplicas   = optional(number)
+      maxReplicas   = optional(number)
+      path          = optional(string)
+      uptimePath    = optional(string)
       uptimeTimeout = optional(number)
-      timeout = optional(number)
-      runtime = optional(string)
+      timeout       = optional(number)
+      runtime       = optional(string)
       memoryRequest = optional(number)
-      secrets = optional(map(string))
-      secretEnv = optional(map(string))
-      env = optional(map(string))
+      secrets       = optional(map(string))
+      secretEnv     = optional(map(string))
+      env           = optional(map(string))
       publishers = optional(list(object({
         id = string
       })))
@@ -435,11 +435,11 @@ variable "resources" {
       })))
 
       cronJobs = optional(map(object({
-        schedule = string
-        timeZone = optional(string)
+        schedule     = string
+        timeZone     = optional(string)
         shellCommand = string
-        env = optional(map(string))
-        secretEnv = optional(map(string))
+        env          = optional(map(string))
+        secretEnv    = optional(map(string))
       })))
 
     })))

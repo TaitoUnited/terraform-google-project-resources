@@ -43,19 +43,19 @@ locals {
   # Admin stuff
 
   serviceAccountsById = {
-    for item in coalesce(try(var.resources.auth.serviceAccounts, []), []):
+    for item in coalesce(try(var.resources.auth.serviceAccounts, []), []) :
     "${item.name}-${coalesce(item.provider, "gcp")}" => item
     if var.create_service_accounts && coalesce(item.provider, "gcp") == "gcp"
   }
 
   permissionsById = {
-    for item in coalesce(try(var.resources.auth.permissions, []), []):
+    for item in coalesce(try(var.resources.auth.permissions, []), []) :
     "${item.id}-${coalesce(item.provider, "gcp")}" => item
     if var.create_permissions && coalesce(item.provider, "gcp") == "gcp"
   }
 
   apisById = {
-    for item in coalesce(try(var.resources.auth.apis, []), []):
+    for item in coalesce(try(var.resources.auth.apis, []), []) :
     "${item.id}-${coalesce(item.provider, "gcp")}" => item
     if var.create_apis && coalesce(item.provider, "gcp") == "gcp"
   }
@@ -63,7 +63,7 @@ locals {
   # API keys
 
   apiKeysById = {
-    for apiKey in coalesce(try(var.resources.auth.apiKeys, []), []):
+    for apiKey in coalesce(try(var.resources.auth.apiKeys, []), []) :
     "${apiKey.name}-${coalesce(apiKey.provider, "gcp")}" => apiKey
     if var.create_api_keys && coalesce(apiKey.provider, "gcp") == "gcp"
   }
@@ -73,28 +73,28 @@ locals {
   origAlerts = coalesce(var.resources.alerts, [])
 
   alertChannelNames = flatten([
-    for alert in local.origAlerts:
+    for alert in local.origAlerts :
     coalesce(alert.channels, [])
   ])
 
   alerts = flatten([
-    for alert in local.origAlerts:
+    for alert in local.origAlerts :
     merge(alert, {
       channelIndices = [
-        for channel in alert.channels:
+        for channel in alert.channels :
         index(local.alertChannelNames, channel)
       ]
     })
   ])
 
   logAlerts = flatten([
-    for alert in local.alerts:
-    coalesce(alert.type, "") == "log" ? [ alert ] : []
+    for alert in local.alerts :
+    coalesce(alert.type, "") == "log" ? [alert] : []
   ])
 
   # Ingress
 
-  ingress = merge({ enabled: false }, var.resources.ingress)
+  ingress = merge({ enabled : false }, var.resources.ingress)
 
   domains = coalesce(var.resources.ingress.domains, [])
 
@@ -106,7 +106,7 @@ locals {
   ]))
 
   mainDomains = [
-    for domain in local.domains:
+    for domain in local.domains :
     join(".",
       slice(
         split(".", domain.name),
@@ -121,32 +121,32 @@ locals {
   services = coalesce(var.resources.services, {})
 
   servicesById = {
-    for id, service in local.services:
-    id => merge(service, { id: id })
+    for id, service in local.services :
+    id => merge(service, { id : id })
   }
 
   uptimeEnabled = coalesce(var.resources.uptimeEnabled, true)
   uptimeTargetsById = {
-    for name, service in local.servicesById:
+    for name, service in local.servicesById :
     name => service
     if var.create_uptime_checks && local.uptimeEnabled && service.uptimePath != null
   }
 
   containersById = {
-    for name, service in local.servicesById:
+    for name, service in local.servicesById :
     name => merge(service, { id = name })
     if var.create_containers && service.type == "container"
   }
 
   containerSecretsById = {
     for secret in flatten([
-      for containerId, container in local.containersById: [
-        for envName, secretName in merge(container.secrets, container.secretEnv):
+      for containerId, container in local.containersById : [
+        for envName, secretName in merge(container.secrets, container.secretEnv) :
         {
-          id = "${containerId}-${secretName}"
+          id          = "${containerId}-${secretName}"
           containerId = containerId
-          envName = envName
-          secretName = secretName
+          envName     = envName
+          secretName  = secretName
         }
       ]
     ]) : secret.id => secret
@@ -154,34 +154,34 @@ locals {
 
   containerCronJobsById = {
     for cronjob in flatten([
-      for containerId, container in local.containersById: [
-        for name, spec in container.cronJobs:
+      for containerId, container in local.containersById : [
+        for name, spec in container.cronJobs :
         merge(spec, { id = "${containerId}-${name}", name = name, container = container })
       ]
     ]) : cronjob.id => cronjob
   }
 
   containersWithPathById = {
-    for id, container in local.containersById:
+    for id, container in local.containersById :
     id => container
     if var.create_ingress && length(values(container.paths)) > 0
   }
 
   containerPathsById = {
     for item in flatten([
-      for containerId, container in local.containersWithPathById: [
-        for item in container.paths:
+      for containerId, container in local.containersWithPathById : [
+        for item in container.paths :
         {
-          id = "${containerId}-${item.path}"
+          id          = "${containerId}-${item.path}"
           containerId = containerId
-          path = item.path
+          path        = item.path
         }
       ]
     ]) : item.id => item
   }
 
   functionsById = {
-    for name, service in local.servicesById:
+    for name, service in local.servicesById :
     name => service
     if var.create_functions && service.type == "function"
   }
@@ -193,55 +193,55 @@ locals {
   # }
 
   postgresDatabasesById = {
-    for name, service in local.servicesById:
-    name => merge(service, { region: service.location })
+    for name, service in local.servicesById :
+    name => merge(service, { region : service.location })
     if var.create_databases && service.type == "postgres"
   }
 
   mysqlDatabasesById = {
-    for name, service in local.servicesById:
-    name => merge(service, { region: service.location })
+    for name, service in local.servicesById :
+    name => merge(service, { region : service.location })
     if var.create_databases && service.type == "mysql"
   }
 
   redisDatabasesById = {
-    for name, service in local.servicesById:
+    for name, service in local.servicesById :
     name => service
     if var.create_in_memory_databases && (service.type == "redis")
   }
 
   topicsById = {
-    for name, service in local.servicesById:
+    for name, service in local.servicesById :
     name => service
     if var.create_topics && service.type == "topic"
   }
 
   bucketsById = {
-    for name, service in local.servicesById:
+    for name, service in local.servicesById :
     name => service
     if var.create_storage_buckets && service.type == "bucket"
   }
 
   ingressFunctionsById = {
-    for name, service in local.servicesById:
+    for name, service in local.servicesById :
     name => service
     if var.create_ingress && local.ingress.enabled && service.type == "function" && service.path != null
   }
 
   ingressStaticContentsById = {
-    for name, service in local.servicesById:
+    for name, service in local.servicesById :
     name => service
     if var.create_ingress && local.ingress.enabled && service.type == "static"
   }
 
   ingressRootStaticContentsById = {
-    for name, service in local.ingressStaticContentsById:
+    for name, service in local.ingressStaticContentsById :
     name => service
     if var.create_ingress && local.ingress.enabled && service.path != null && coalesce(service.path, "") == "/"
   }
 
   ingressChildStaticContentsById = {
-    for name, service in local.ingressStaticContentsById:
+    for name, service in local.ingressStaticContentsById :
     name => service
     if var.create_ingress && local.ingress.enabled && service.path != null && coalesce(service.path, "") != "/"
   }
@@ -254,10 +254,10 @@ locals {
 }
 
 module "admin" {
-  source           = "TaitoUnited/admin/google"
-  version          = "3.2.0"
+  source  = "TaitoUnited/admin/google"
+  version = "3.2.0"
 
-  project_id       = local.project_id
+  project_id = local.project_id
 
   permissions      = values(local.permissionsById)
   service_accounts = values(local.serviceAccountsById)
@@ -269,11 +269,11 @@ module "databases" {
     module.admin.apis,
   ]
 
-  source              = "TaitoUnited/databases/google"
-  version             = "3.3.2"
+  source  = "TaitoUnited/databases/google"
+  version = "3.3.2"
 
   postgresql_clusters = values(local.postgresDatabasesById)
   mysql_clusters      = values(local.mysqlDatabasesById)
 
-  private_network_id  = var.private_network_id
+  private_network_id = var.private_network_id
 }

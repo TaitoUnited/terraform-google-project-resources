@@ -25,20 +25,20 @@ resource "google_storage_bucket" "bucket" {
   storage_class = each.value.storageClass
 
   labels = {
-    project   = var.project
-    env       = var.env
-    purpose   = "storage"
+    project = var.project
+    env     = var.env
+    purpose = "storage"
   }
 
   dynamic "cors" {
     for_each = (
       each.value.corsRules != null && each.value.corsRules != ""
-        ? each.value.corsRules
-        : []
+      ? each.value.corsRules
+      : []
     )
     content {
-      origin = cors.value.allowedOrigins
-      method = coalesce(cors.value.allowedMethods, ["GET","HEAD"])
+      origin          = cors.value.allowedOrigins
+      method          = coalesce(cors.value.allowedMethods, ["GET", "HEAD"])
       response_header = coalesce(cors.value.exposeHeaders, ["*"])
       max_age_seconds = coalesce(cors.value.maxAgeSeconds, 5)
     }
@@ -53,13 +53,13 @@ resource "google_storage_bucket" "bucket" {
   }
 
   uniform_bucket_level_access = each.value.uniformBucketLevelAccessEnabled
-  public_access_prevention = each.value.publicAccessPreventionEnabled ? "enforced" : "inherited"
+  public_access_prevention    = each.value.publicAccessPreventionEnabled ? "enforced" : "inherited"
 
   # transition
   dynamic "lifecycle_rule" {
     for_each = (
       each.value.transitionRetainDays != null &&
-        each.value.transitionRetainDays != ""
+      each.value.transitionRetainDays != ""
       ? [1]
       : []
     )
@@ -69,7 +69,7 @@ resource "google_storage_bucket" "bucket" {
         age = each.value.transitionRetainDays
       }
       action {
-        type = "SetStorageClass"
+        type          = "SetStorageClass"
         storage_class = each.value.transitionStorageClass
       }
     }
@@ -79,14 +79,14 @@ resource "google_storage_bucket" "bucket" {
   dynamic "lifecycle_rule" {
     for_each = (
       each.value.versioningRetainDays != null &&
-        each.value.versioningRetainDays != ""
+      each.value.versioningRetainDays != ""
       ? [1]
       : []
     )
 
     content {
       condition {
-        age = each.value.versioningRetainDays
+        age        = each.value.versioningRetainDays
         with_state = "ARCHIVED"
       }
       action {
@@ -99,13 +99,13 @@ resource "google_storage_bucket" "bucket" {
   dynamic "lifecycle_rule" {
     for_each = (
       each.value.autoDeletionRetainDays != null &&
-        each.value.autoDeletionRetainDays != ""
+      each.value.autoDeletionRetainDays != ""
       ? [1]
       : []
     )
     content {
       condition {
-        age = each.value.autoDeletionRetainDays
+        age        = each.value.autoDeletionRetainDays
         with_state = "ANY"
       }
       action {
@@ -125,15 +125,15 @@ resource "google_storage_bucket_iam_binding" "bucket_admin" {
     module.admin.service_accounts,
   ]
   for_each = local.bucketsById
-  bucket  = each.value.name
-  role    = "roles/storage.admin"
+  bucket   = each.value.name
+  role     = "roles/storage.admin"
   members = [
     for user in coalesce(
       each.value.admins != null
       ? each.value.admins
       : [],
       []
-    ):
+    ) :
     user.id
   ]
 }
@@ -144,15 +144,15 @@ resource "google_storage_bucket_iam_binding" "bucket_object_admin" {
     module.admin.service_accounts,
   ]
   for_each = local.bucketsById
-  bucket  = each.value.name
-  role    = "roles/storage.objectAdmin"
+  bucket   = each.value.name
+  role     = "roles/storage.objectAdmin"
   members = [
     for user in coalesce(
       each.value.objectAdmins != null
       ? each.value.objectAdmins
       : [],
       []
-    ):
+    ) :
     user.id
   ]
 }
@@ -163,15 +163,15 @@ resource "google_storage_bucket_iam_binding" "bucket_object_viewer" {
     module.admin.service_accounts,
   ]
   for_each = local.bucketsById
-  bucket  = each.value.name
-  role    = "roles/storage.objectViewer"
+  bucket   = each.value.name
+  role     = "roles/storage.objectViewer"
   members = [
     for user in coalesce(
       each.value.objectViewers != null
       ? each.value.objectViewers
       : [],
       []
-    ):
+    ) :
     user.id
   ]
 }

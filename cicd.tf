@@ -19,16 +19,16 @@ resource "google_cloudbuild_trigger" "cicd_trigger" {
     module.admin.apis,
   ]
 
-  count    = var.create_build_trigger ? 1 : 0
+  count = var.create_build_trigger ? 1 : 0
 
-  project  = local.cicd_project_id
-  name     = "${var.project}-${var.env}"
+  project = local.cicd_project_id
+  name    = "${var.project}-${var.env}"
 
   service_account = var.create_cicd_service_account ? google_service_account.cicd_service_account[0].id : null
 
   github {
-    owner    = var.vc_organization
-    name     = var.vc_repository
+    owner = var.vc_organization
+    name  = var.vc_repository
     push {
       branch = "^${var.vc_branch}$"
     }
@@ -44,15 +44,15 @@ resource "google_cloudbuild_trigger" "cicd_trigger" {
 
   filename = coalesce(var.cicd_file_path, "cloudbuild.yaml")
 
-  location = var.cicd_location
+  location       = var.cicd_location
   included_files = var.cicd_included_files
-  ignored_files = var.cicd_ignored_files
+  ignored_files  = var.cicd_ignored_files
 }
 
 resource "google_service_account" "cicd_service_account" {
-  count    = var.create_cicd_service_account ? 1 : 0
+  count = var.create_cicd_service_account ? 1 : 0
 
-  project  = local.cicd_project_id
+  project    = local.cicd_project_id
   account_id = "${var.project}-${var.env}-cicd"
 }
 
@@ -80,85 +80,85 @@ resource "google_project_iam_member" "cicd_service_account_user" {
 */
 
 resource "google_project_iam_member" "cicd_cloudbuild_builder" {
-  count    = var.create_cicd_service_account ? 1 : 0
+  count = var.create_cicd_service_account ? 1 : 0
 
-  project  = local.cicd_project_id
+  project = local.cicd_project_id
   role    = "roles/cloudbuild.builds.builder"
   member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }
 
 resource "google_project_iam_member" "cicd_logs_writer" {
-  count    = var.create_cicd_service_account ? 1 : 0
+  count = var.create_cicd_service_account ? 1 : 0
 
-  project  = local.cicd_project_id
+  project = local.cicd_project_id
   role    = "roles/logging.logWriter"
   member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }
 
 resource "google_project_iam_member" "cicd_cloudsql_client" {
-  count    = var.create_cicd_service_account ? 1 : 0
+  count = var.create_cicd_service_account ? 1 : 0
 
-  project  = local.infra_project_id
+  project = local.infra_project_id
   role    = "roles/cloudsql.client"
   member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }
 
 resource "google_project_iam_member" "cicd_run_developer" {
-  count    = var.create_cicd_service_account ? 1 : 0
+  count = var.create_cicd_service_account ? 1 : 0
 
-  project  = local.infra_project_id
+  project = local.infra_project_id
   role    = "roles/run.developer"
   member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }
 
 resource "google_project_iam_member" "cicd_container_cluster_viewer" {
-  count    = var.create_cicd_service_account ? 1 : 0
+  count = var.create_cicd_service_account ? 1 : 0
 
-  project  = local.infra_project_id
+  project = local.infra_project_id
   role    = "roles/container.clusterViewer"
   member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }
 
 resource "google_artifact_registry_repository_iam_member" "cicd_artifact_registry_reader" {
-  count    = var.create_cicd_service_account && var.create_container_image_repositories ? 1 : 0
+  count = var.create_cicd_service_account && var.create_container_image_repositories ? 1 : 0
 
-  project = google_artifact_registry_repository.container-repository[0].project
-  location = google_artifact_registry_repository.container-repository[0].location
+  project    = google_artifact_registry_repository.container-repository[0].project
+  location   = google_artifact_registry_repository.container-repository[0].location
   repository = google_artifact_registry_repository.container-repository[0].name
 
-  role    = "roles/artifactregistry.reader"
-  member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
+  role   = "roles/artifactregistry.reader"
+  member = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }
 
 resource "google_artifact_registry_repository_iam_member" "cicd_artifact_registry_writer" {
-  count    = var.create_cicd_service_account && var.create_container_image_repositories ? 1 : 0
+  count = var.create_cicd_service_account && var.create_container_image_repositories ? 1 : 0
 
-  project = google_artifact_registry_repository.container-repository[0].project
-  location = google_artifact_registry_repository.container-repository[0].location
+  project    = google_artifact_registry_repository.container-repository[0].project
+  location   = google_artifact_registry_repository.container-repository[0].location
   repository = google_artifact_registry_repository.container-repository[0].name
 
-  role    = "roles/artifactregistry.writer"
-  member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
+  role   = "roles/artifactregistry.writer"
+  member = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }
 
 resource "google_artifact_registry_repository_iam_member" "cicd_artifact_registry_reader_other_env" {
-  count    = var.create_cicd_service_account && var.create_container_image_repositories ? 0 : 1
+  count = var.create_cicd_service_account && var.create_container_image_repositories ? 0 : 1
 
-  project = data.google_artifact_registry_repository.container-repository[0].project
-  location = data.google_artifact_registry_repository.container-repository[0].location
+  project    = data.google_artifact_registry_repository.container-repository[0].project
+  location   = data.google_artifact_registry_repository.container-repository[0].location
   repository = data.google_artifact_registry_repository.container-repository[0].name
 
-  role    = "roles/artifactregistry.reader"
-  member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
+  role   = "roles/artifactregistry.reader"
+  member = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }
 
 resource "google_artifact_registry_repository_iam_member" "cicd_artifact_registry_writer_other_env" {
-  count    = var.create_cicd_service_account && var.create_container_image_repositories ? 0 : 1
+  count = var.create_cicd_service_account && var.create_container_image_repositories ? 0 : 1
 
-  project = data.google_artifact_registry_repository.container-repository[0].project
-  location = data.google_artifact_registry_repository.container-repository[0].location
+  project    = data.google_artifact_registry_repository.container-repository[0].project
+  location   = data.google_artifact_registry_repository.container-repository[0].location
   repository = data.google_artifact_registry_repository.container-repository[0].name
 
-  role    = "roles/artifactregistry.writer"
-  member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
+  role   = "roles/artifactregistry.writer"
+  member = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }

@@ -19,8 +19,8 @@ resource "google_monitoring_uptime_check_config" "https" {
     module.admin.apis,
   ]
 
-  for_each     = local.uptimeTargetsById
-  project      = local.uptime_project_id
+  for_each         = local.uptimeTargetsById
+  project          = local.uptime_project_id
   selected_regions = var.uptime_regions
 
   display_name = "${var.project}-${var.env}-${each.value.id}"
@@ -29,16 +29,16 @@ resource "google_monitoring_uptime_check_config" "https" {
   monitored_resource {
     type = "uptime_url"
     labels = {
-      host = try(local.ingress.domains[0].name, null)
+      host       = try(local.ingress.domains[0].name, null)
       project_id = local.uptime_project_id
     }
   }
 
   http_check {
-    use_ssl = true
+    use_ssl      = true
     validate_ssl = true
-    port    = 443
-    path    = each.value.uptimePath
+    port         = 443
+    path         = each.value.uptimePath
   }
 }
 

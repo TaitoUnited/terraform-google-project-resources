@@ -16,9 +16,9 @@
 
 # Route paths to container backend services
 resource "google_compute_url_map" "app" {
-  count           = values(local.containerPathsById) > 0 ? 1 : 0
+  count = values(local.containerPathsById) > 0 ? 1 : 0
 
-  name            = "${var.project}-${var.env}"
+  name = "${var.project}-${var.env}"
 
   host_rule {
     hosts        = local.allDomainNames
@@ -32,13 +32,13 @@ resource "google_compute_url_map" "app" {
   }
 
   path_matcher {
-    name            = "app-paths"
+    name = "app-paths"
 
     dynamic "path_rule" {
       for_each = local.containerPathsById
 
       content {
-        service           = google_compute_backend_service.container[each.value.containerId].id
+        service = google_compute_backend_service.container[each.value.containerId].id
 
         paths = [
           "${each.value}",
@@ -59,7 +59,7 @@ resource "google_compute_url_map" "app" {
 
 # Container backend services
 resource "google_compute_backend_service" "container" {
-  for_each              = local.containersWithPathById
+  for_each = local.containersWithPathById
 
   name                  = "${var.project}-${var.env}-${each.key}"
   protocol              = "HTTP"
@@ -72,7 +72,7 @@ resource "google_compute_backend_service" "container" {
 
 # Serverless NEGs connect the load balancer to Cloud Run
 resource "google_compute_region_network_endpoint_group" "container" {
-  for_each              = local.containersWithPathById
+  for_each = local.containersWithPathById
 
   name                  = "${var.project}-${var.env}-${each.key}"
   region                = var.region
@@ -85,31 +85,31 @@ resource "google_compute_region_network_endpoint_group" "container" {
 
 # Allow public access to container endpoints that have path set
 resource "google_cloud_run_v2_service_iam_member" "public_invoker" {
-  for_each              = local.containersWithPathById
+  for_each = local.containersWithPathById
 
-  location              = var.region
-  name                  = google_cloud_run_v2_service.container[each.key].name
+  location = var.region
+  name     = google_cloud_run_v2_service.container[each.key].name
 
-  role                  = "roles/run.invoker"
-  member                = "allUsers"
+  role   = "roles/run.invoker"
+  member = "allUsers"
 }
 
 resource "google_compute_global_address" "app" {
-  count                 = var.create_ingress ? 1 : 0
+  count = var.create_ingress ? 1 : 0
 
   name = "${var.project}-${var.env}"
 }
 
 resource "google_compute_target_https_proxy" "app" {
-  count            = var.create_ingress ? 1 : 0
+  count = var.create_ingress ? 1 : 0
 
-  name             = "${var.project}-${var.env}"
-  url_map          = google_compute_url_map.app[0].id
-  certificate_map  = var.certificate_map # TODO: "//certificatemanager.googleapis.com/${google_certificate_manager_certificate_map.map.id}"
+  name            = "${var.project}-${var.env}"
+  url_map         = google_compute_url_map.app[0].id
+  certificate_map = var.certificate_map # TODO: "//certificatemanager.googleapis.com/${google_certificate_manager_certificate_map.map.id}"
 }
 
 resource "google_compute_global_forwarding_rule" "app" {
-  count                 = var.create_ingress ? 1 : 0
+  count = var.create_ingress ? 1 : 0
 
   name                  = "${var.project}-${var.env}"
   ip_address            = google_compute_global_address.app[0].address

@@ -15,7 +15,7 @@
  */
 
 resource "google_compute_network" "vpc" {
-  count                   = var.create_network ? 1 : 0
+  count = var.create_network ? 1 : 0
 
   name                    = var.private_network_id
   auto_create_subnetworks = false
@@ -24,7 +24,7 @@ resource "google_compute_network" "vpc" {
 }
 
 resource "google_compute_subnetwork" "container" {
-  count                    = var.create_network ? 1 : 0
+  count = var.create_network ? 1 : 0
 
   name                     = var.private_container_subnetwork_id
   region                   = var.region

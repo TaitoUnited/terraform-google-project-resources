@@ -19,8 +19,8 @@ resource "google_logging_metric" "log_alert_metric" {
     module.admin.apis,
   ]
 
-  for_each   = {for item in (var.create_log_alert_metrics ? local.logAlerts : []): item.name => item}
-  project    = local.log_alert_project_id
+  for_each = { for item in(var.create_log_alert_metrics ? local.logAlerts : []) : item.name => item }
+  project  = local.log_alert_project_id
 
   name   = each.value.name
   filter = each.value.rule

@@ -19,7 +19,7 @@ resource "google_certificate_manager_certificate" "certificate" {
     module.admin.apis,
   ]
 
-  for_each   = {for item in (var.certificate_map != "" && var.create_domain_certificate ? local.allDomainNames : []): item => item}
+  for_each = { for item in(var.certificate_map != "" && var.create_domain_certificate ? local.allDomainNames : []) : item => item }
 
   name     = replace(each.value, ".", "-")
   location = "global"
@@ -38,11 +38,11 @@ resource "google_certificate_manager_certificate_map" "app" {
 */
 
 resource "google_certificate_manager_certificate_map_entry" "certificate" {
-  for_each   = {for item in (var.certificate_map != "" && var.create_domain_certificate ? local.allDomainNames : []): item => item}
-  
-  name       = replace(each.value, ".", "-")
-  hostname   = each.value
-  map        = var.certificate_map
+  for_each = { for item in(var.certificate_map != "" && var.create_domain_certificate ? local.allDomainNames : []) : item => item }
+
+  name     = replace(each.value, ".", "-")
+  hostname = each.value
+  map      = var.certificate_map
 
   certificates = [
     google_certificate_manager_certificate.certificate[each.key].id

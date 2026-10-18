@@ -15,26 +15,26 @@
  */
 
 resource "google_service_account" "container" {
-  for_each     = local.containersById
+  for_each = local.containersById
 
   account_id   = "${var.project}-${var.env}-${each.key}"
   display_name = "${var.project}-${var.env}-${each.key}"
 
-  depends_on   = [module.admin.apis]
+  depends_on = [module.admin.apis]
 }
 
 resource "google_secret_manager_secret_iam_member" "container" {
-  for_each     = local.containerSecretsById
+  for_each = local.containerSecretsById
 
-  secret_id    = each.value.secretName
-  role         = "roles/secretmanager.secretAccessor"
-  member       = "serviceAccount:${google_service_account.container[each.value.containerId].email}"
+  secret_id = each.value.secretName
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.container[each.value.containerId].email}"
 }
 
 resource "google_cloud_run_v2_service" "container" {
-  for_each      = local.containersById
-  name          = "${var.project}-${var.env}-${each.key}"
-  location      = var.region
+  for_each = local.containersById
+  name     = "${var.project}-${var.env}-${each.key}"
+  location = var.region
 
   # Allow traffic through the external Application Load Balancer,
   # not directly through the default run.app URL.
@@ -140,9 +140,9 @@ resource "google_cloud_run_v2_service" "container" {
 /* ---- Cron job ----- */
 
 resource "google_cloud_run_v2_job" "cronjob" {
-  for_each      = local.containerCronJobsById
-  name          = "${var.project}-${var.env}-${each.key}"
-  location      = var.region
+  for_each = local.containerCronJobsById
+  name     = "${var.project}-${var.env}-${each.key}"
+  location = var.region
 
   deletion_protection = false
 
@@ -204,16 +204,16 @@ resource "google_cloud_run_v2_job" "cronjob" {
 }
 
 resource "google_service_account" "scheduler" {
-  for_each      = local.containerCronJobsById
+  for_each = local.containerCronJobsById
 
   account_id   = "${var.project}-${var.env}-${each.key}"
   display_name = "${var.project}-${var.env}-${each.key}"
 
-  depends_on   = [module.admin.apis]
+  depends_on = [module.admin.apis]
 }
 
 resource "google_cloud_run_v2_job_iam_member" "scheduler" {
-  for_each      = local.containerCronJobsById
+  for_each = local.containerCronJobsById
 
   location = var.region
   name     = google_cloud_run_v2_job.cronjob[each.key].name
@@ -223,12 +223,12 @@ resource "google_cloud_run_v2_job_iam_member" "scheduler" {
 }
 
 resource "google_cloud_scheduler_job" "cronjob" {
-  for_each    = local.containerCronJobsById
-  name        = "${var.project}-${var.env}-${each.key}"
-  region      = var.region
+  for_each = local.containerCronJobsById
+  name     = "${var.project}-${var.env}-${each.key}"
+  region   = var.region
 
-  schedule    = each.value.schedule
-  time_zone   = coalesce(each.value.timeZone, "Etc/UTC")
+  schedule  = each.value.schedule
+  time_zone = coalesce(each.value.timeZone, "Etc/UTC")
 
   http_target {
     http_method = "POST"

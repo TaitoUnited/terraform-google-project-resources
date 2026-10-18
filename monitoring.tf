@@ -15,7 +15,7 @@
  */
 
 data "google_monitoring_notification_channel" "log_alert_channel" {
-  for_each     = {for item in local.alertChannelNames: item => item}
+  for_each     = { for item in local.alertChannelNames : item => item }
   project      = local.log_alert_project_id
   display_name = each.value
 }
@@ -26,17 +26,17 @@ resource "google_monitoring_alert_policy" "log_alert_policy" {
   depends_on = [
     google_logging_metric.log_alert_metric,
   ]
-  for_each   = {for item in (var.create_log_alert_policies ? local.logAlerts : []): item.name => item}
-  project    = local.log_alert_project_id
+  for_each = { for item in(var.create_log_alert_policies ? local.logAlerts : []) : item.name => item }
+  project  = local.log_alert_project_id
 
-  display_name          = each.value.name
-  enabled               = true
+  display_name = each.value.name
+  enabled      = true
   notification_channels = [
-    for i in each.value.channelIndices:
+    for i in each.value.channelIndices :
     data.google_monitoring_notification_channel.log_alert_channel[i].name
   ]
 
-  combiner     = "OR"
+  combiner = "OR"
   conditions {
     display_name = each.value.name
     condition_threshold {
