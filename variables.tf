@@ -189,13 +189,13 @@ variable "zone" {
 
 # Network
 
-variable "private_network_id" {
+variable "private_network_name" {
   type        = string
   default     = ""
   description = "Private network for containers and database connectivity"
 }
 
-variable "private_container_subnetwork_id" {
+variable "private_container_subnetwork_name" {
   type        = string
   default     = ""
   description = "Private subnetwork for containers"
@@ -379,7 +379,7 @@ variable "resources" {
       highAvailabilityEnabled    = optional(bool)
       publicIpEnabled            = optional(bool)
       authorizedNetworks         = optional(list(string))
-      flags                      = optional(any)
+      flags                      = optional(map(string))
       adminUsername              = optional(string)
 
       storageClass = optional(string)

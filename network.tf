@@ -17,18 +17,30 @@
 resource "google_compute_network" "vpc" {
   count = var.create_network ? 1 : 0
 
-  name                    = var.private_network_id
+  name                    = var.private_network_name
   auto_create_subnetworks = false
 
   depends_on = [module.admin.apis]
 }
 
+data "google_compute_network" "vpc" {
+  name = var.private_network_name
+
+  depends_on = [google_compute_network.vpc]
+}
+
 resource "google_compute_subnetwork" "container" {
   count = var.create_network ? 1 : 0
 
-  name                     = var.private_container_subnetwork_id
+  name                     = var.private_container_subnetwork_name
   region                   = var.region
   network                  = google_compute_network.vpc[0].id
   ip_cidr_range            = "10.20.0.0/24"
   private_ip_google_access = true
+}
+
+data "google_compute_subnetwork" "container" {
+  name = var.private_container_subnetwork_name
+
+  depends_on = [google_compute_subnetwork.container]
 }

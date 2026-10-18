@@ -20,6 +20,12 @@ provider "google" {
   zone    = var.zone
 }
 
+provider "google-beta" {
+  project = var.project_id
+  region  = var.region
+  zone    = var.zone
+}
+
 locals {
 
   # Projects
@@ -155,8 +161,8 @@ locals {
   containerCronJobsById = {
     for cronjob in flatten([
       for containerId, container in local.containersById : [
-        for name, spec in container.cronJobs :
-        merge(spec, { id = "${containerId}-${name}", name = name, container = container })
+        for name, spec in coalesce(try(container.cronJobs, null), {}) :
+        merge(spec, { id = name, name = name, container = container })
       ]
     ]) : cronjob.id => cronjob
   }
@@ -164,7 +170,7 @@ locals {
   containersWithPathById = {
     for id, container in local.containersById :
     id => container
-    if var.create_ingress && length(values(container.paths)) > 0
+    if var.create_ingress && length(coalesce(try(container.paths, null), [])) > 0
   }
 
   containerPathsById = {
@@ -255,7 +261,7 @@ locals {
 
 module "admin" {
   source  = "TaitoUnited/admin/google"
-  version = "3.2.0"
+  version = "3.2.1"
 
   project_id = local.project_id
 
@@ -275,5 +281,5 @@ module "databases" {
   postgresql_clusters = values(local.postgresDatabasesById)
   mysql_clusters      = values(local.mysqlDatabasesById)
 
-  private_network_id = var.private_network_id
+  private_network_id = data.google_compute_network.vpc.id
 }

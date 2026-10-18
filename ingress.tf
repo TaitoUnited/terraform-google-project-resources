@@ -16,7 +16,7 @@
 
 # Route paths to container backend services
 resource "google_compute_url_map" "app" {
-  count = values(local.containerPathsById) > 0 ? 1 : 0
+  count = length(local.containerPathsById) > 0 ? 1 : 0
 
   name = "${var.project}-${var.env}"
 

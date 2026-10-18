@@ -38,7 +38,7 @@ resource "google_cloud_run_v2_service" "container" {
 
   # Allow traffic through the external Application Load Balancer,
   # not directly through the default run.app URL.
-  ingress  = length(each.value.paths) == 0 ? "INGRESS_TRAFFIC_INTERNAL_ONLY" : "INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER"
+  ingress = length(each.value.paths) == 0 ? "INGRESS_TRAFFIC_INTERNAL_ONLY" : "INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER"
 
   # Simplify calls made to internal service by not requiring google-signed token
   invoker_iam_disabled = length(each.value.paths) == 0
@@ -82,6 +82,7 @@ resource "google_cloud_run_v2_service" "container" {
       }
 
       # Populate cloud run service urls of other services as environment variables
+      /* TODO: resolve cycle
       dynamic "env" {
         for_each = {
           for key, container in local.containersById :
@@ -95,11 +96,12 @@ resource "google_cloud_run_v2_service" "container" {
           value = google_cloud_run_v2_service.container[target.key].uri
         }
       }
+      */
 
       resources {
         limits = {
-          cpu    = coalesce(each.value.cpuLimit, "1")
-          memory = coalesce(each.value.memoryLimit, "512Mi")
+          cpu    = coalesce(try(each.value.cpuLimit, null), "1")
+          memory = coalesce(try(each.value.memoryLimit, null), "512Mi")
         }
       }
 
@@ -140,8 +142,8 @@ resource "google_cloud_run_v2_service" "container" {
       egress = "PRIVATE_RANGES_ONLY"
 
       network_interfaces {
-        network    = var.private_network_id
-        subnetwork = var.private_container_subnetwork_id
+        network    = data.google_compute_network.vpc.id
+        subnetwork = data.google_compute_subnetwork.container.id
       }
     }
 
@@ -200,8 +202,8 @@ resource "google_cloud_run_v2_job" "cronjob" {
 
         resources {
           limits = {
-            cpu    = coalesce(each.value.cpuLimit, each.value.container.cpuLimit, "1")
-            memory = coalesce(each.value.memoryLimit, each.value.container.memoryLimit, "512Mi")
+            cpu    = coalesce(try(each.value.cpuLimit, null), try(each.value.container.cpuLimit, null), "1")
+            memory = coalesce(try(each.value.memoryLimit, null), try(each.value.container.memoryLimit, null), "512Mi")
           }
         }
       }
@@ -210,8 +212,8 @@ resource "google_cloud_run_v2_job" "cronjob" {
         egress = "PRIVATE_RANGES_ONLY"
 
         network_interfaces {
-          network    = var.private_network_id
-          subnetwork = var.private_container_subnetwork_id
+          network    = data.google_compute_network.vpc.id
+          subnetwork = data.google_compute_subnetwork.container.id
         }
       }
     }

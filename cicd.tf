@@ -64,7 +64,7 @@ data "google_service_account" "cicd_service_account" {
 
 resource "google_service_account_iam_member" "cicd_iam_service_account_user" {
   for_each           = local.containersById
-  service_account_id = "serviceAccount:${google_service_account.container[each.value.containerId].email}"
+  service_account_id = google_service_account.container[each.key].name
   role               = "roles/iam.serviceAccountUser"
   member             = "serviceAccount:${data.google_service_account.cicd_service_account.email}"
 }
