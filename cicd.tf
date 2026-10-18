@@ -56,6 +56,19 @@ resource "google_service_account" "cicd_service_account" {
   account_id = "${var.project}-${var.env}-cicd"
 }
 
+data "google_service_account" "cicd_service_account" {
+  depends_on = [google_service_account.cicd_service_account]
+  project    = local.cicd_project_id
+  account_id = "${var.project}-${var.env}-cicd"
+}
+
+resource "google_service_account_iam_member" "cicd_iam_service_account_user" {
+  for_each           = local.containersById
+  service_account_id = "serviceAccount:${google_service_account.container[each.value.containerId].email}"
+  role               = "roles/iam.serviceAccountUser"
+  member             = "serviceAccount:${data.google_service_account.cicd_service_account.email}"
+}
+
 /* TODO: do we need to enable the iam.serviceAccountUser role in some cases?
 resource "google_project_iam_member" "cicd_service_account_user" {
   count    = var.create_cicd_service_account ? 1 : 0
@@ -87,6 +100,14 @@ resource "google_project_iam_member" "cicd_cloudsql_client" {
 
   project  = local.infra_project_id
   role    = "roles/cloudsql.client"
+  member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
+}
+
+resource "google_project_iam_member" "cicd_run_developer" {
+  count    = var.create_cicd_service_account ? 1 : 0
+
+  project  = local.infra_project_id
+  role    = "roles/run.developer"
   member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }
 

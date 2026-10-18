@@ -20,7 +20,7 @@ auth:
     - id: compute.googleapis.com
     - id: run.googleapis.com
     - id: secretmanager.googleapis.com
-    - id: vpcaccess.googleapis.com
+    - id: servicenetworking.googleapis.com
     - id: certificatemanager.googleapis.com
     - id: sqladmin.googleapis.com
     - id: cloudbuild.googleapis.com
@@ -38,8 +38,8 @@ auth:
       roles: [ "roles/cloudkms.publicKeyViewer" ]
 
   permissions:
-    - id: "serviceAccount:xxx@xxx.iam.gserviceaccount.com"
-      roles: ["roles/cloudsql.client"]
+    - id: "service-PROJECT_NUMBER@serverless-robot-prod.iam.gserviceaccount.com"
+      roles: ["roles/artifactregistry.reader"]
 
 ingress:
   class: gateway
@@ -181,6 +181,7 @@ services:
 With `create_*` variables you can choose which resources are created/updated in which phase. For example, you can choose to update some of the resources manually when the environment is created or updated:
 
 ```
+  create_network                      = true
   create_domain_certificate           = true
   create_container_image_repositories = true
   create_build_trigger                = true

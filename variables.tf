@@ -29,6 +29,12 @@ variable "create_domain_certificate" {
   description = "If true, a domain certificate is created for each domain."
 }
 
+variable "create_network" {
+  type        = bool
+  default     = false
+  description = "If true, a private network is created."
+}
+
 variable "create_build_trigger" {
   type        = bool
   default     = false
@@ -68,13 +74,13 @@ variable "create_topics" {
 variable "create_ingress" {
   type        = bool
   default     = false
-  description = "If true, ingress is created. (TODO)"
+  description = "If true, ingress is created."
 }
 
 variable "create_containers" {
   type        = bool
   default     = false
-  description = "If true, containers are created. (TODO)"
+  description = "If true, containers are created."
 }
 
 variable "create_functions" {
@@ -181,10 +187,18 @@ variable "zone" {
   description = "Google Cloud zone."
 }
 
+# Network
+
 variable "private_network_id" {
   type        = string
   default     = ""
   description = "Private network for containers and database connectivity"
+}
+
+variable "private_container_subnetwork_id" {
+  type        = string
+  default     = ""
+  description = "Private subnetwork for containers"
 }
 
 # Version control
@@ -402,6 +416,8 @@ variable "resources" {
         id = string
       })))
       replicas = optional(number)
+      minReplicas = optional(number)
+      maxReplicas = optional(number)
       path = optional(string)
       uptimePath = optional(string)
       uptimeTimeout = optional(number)

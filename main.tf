@@ -138,6 +138,39 @@ locals {
     if var.create_containers && service.type == "container"
   }
 
+  containerSecretsById = {
+    for secret in flatten([
+      for containerId, container in local.containersById: [
+        for envName, secretName in merge(container.secrets, container.secretEnv):
+        {
+          id = "${containerId}-${secretName}"
+          containerId = containerId
+          envName = envName
+          secretName = secretName
+        }
+      ]
+    ]) : secret.id => secret
+  }
+
+  containersWithPathById = {
+    for id, container in local.containersById:
+    id => container
+    if var.create_ingress && length(values(container.paths)) > 0
+  }
+
+  containerPathsById = {
+    for item in flatten([
+      for containerId, container in local.containersWithPathById: [
+        for item in container.paths:
+        {
+          id = "${containerId}-${item.path}"
+          containerId = containerId
+          path = item.path
+        }
+      ]
+    ]) : item.id => item
+  }
+
   functionsById = {
     for name, service in local.servicesById:
     name => service

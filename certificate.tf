@@ -31,6 +31,12 @@ resource "google_certificate_manager_certificate" "certificate" {
   }
 }
 
+/* TODO
+resource "google_certificate_manager_certificate_map" "app" {
+  name       = "${var.project}-${var.env}"
+}
+*/
+
 resource "google_certificate_manager_certificate_map_entry" "certificate" {
   for_each   = {for item in (var.certificate_map != "" && var.create_domain_certificate ? local.allDomainNames : []): item => item}
   
