@@ -142,8 +142,8 @@ resource "google_cloud_run_v2_service" "container" {
       egress = "PRIVATE_RANGES_ONLY"
 
       network_interfaces {
-        network    = data.google_compute_network.vpc.id
-        subnetwork = data.google_compute_subnetwork.container.id
+        network    = data.google_compute_network.vpc[0].id
+        subnetwork = data.google_compute_subnetwork.container[0].id
       }
     }
 
@@ -212,8 +212,8 @@ resource "google_cloud_run_v2_job" "cronjob" {
         egress = "PRIVATE_RANGES_ONLY"
 
         network_interfaces {
-          network    = data.google_compute_network.vpc.id
-          subnetwork = data.google_compute_subnetwork.container.id
+          network    = data.google_compute_network.vpc[0].id
+          subnetwork = data.google_compute_subnetwork.container[0].id
         }
       }
     }

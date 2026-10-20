@@ -32,7 +32,7 @@ locals {
 
   project_id                    = var.project_id
   infra_project_id              = coalesce(var.infra_project_id, local.project_id)
-  container_registry_project_id = coalesce(var.container_registry_project_id, local.project_id)
+  container_registry_project_id = coalesce(var.container_registry_project_id, var.infra_project_id, local.project_id)
 
   cicd_project_id = (
     var.cicd_project_id != null && var.cicd_project_id != "" ? var.cicd_project_id : var.project_id
@@ -48,12 +48,6 @@ locals {
 
   # Admin stuff
 
-  serviceAccountsById = {
-    for item in coalesce(try(var.resources.auth.serviceAccounts, []), []) :
-    "${item.name}-${coalesce(item.provider, "gcp")}" => item
-    if var.create_service_accounts && coalesce(item.provider, "gcp") == "gcp"
-  }
-
   permissionsById = {
     for item in coalesce(try(var.resources.auth.permissions, []), []) :
     "${item.id}-${coalesce(item.provider, "gcp")}" => item
@@ -65,6 +59,36 @@ locals {
     "${item.id}-${coalesce(item.provider, "gcp")}" => item
     if var.create_apis && coalesce(item.provider, "gcp") == "gcp"
   }
+
+  # Service accounts
+
+  serviceAccountsById = var.use_legacy_service_accounts ? {} : {
+    for item in coalesce(try(var.resources.auth.serviceAccounts, []), []) :
+    "${item.name}-${coalesce(item.provider, "gcp")}" => item
+    if var.create_service_accounts && coalesce(item.provider, "gcp") == "gcp"
+  }
+
+  legacyServiceAccountsById = var.use_legacy_service_accounts ? {
+    for acc in coalesce(try(var.resources.auth.serviceAccounts, []), []):
+    "${acc.name}-${coalesce(acc.provider, "gcp")}" => acc
+    if var.create_service_accounts && coalesce(acc.provider, "gcp") == "gcp"
+  } : {}
+
+  legacyServiceAccountRoles = flatten([
+    for id, serviceAccount in local.legacyServiceAccountsById: [
+      for role in serviceAccount.roles:
+      {
+        id = id
+        role = role
+        serviceAccount = serviceAccount
+      }
+    ]
+  ])
+
+  legacyServiceAccountRolesByKey = {
+    for r in local.legacyServiceAccountRoles:
+    "${r.id}-${r.role}" => r
+  }  
 
   # API keys
 
@@ -197,6 +221,12 @@ locals {
   #   name => service
   #   if var.create_function_permissions && service.type == "function"
   # }
+  
+  # Cloud run
+
+  cloudRunEnabled = length(local.containersById) > 0 || length(local.containerCronJobsById) > 0
+
+  # Databases
 
   postgresDatabasesById = {
     for name, service in local.servicesById :
@@ -261,7 +291,7 @@ locals {
 
 module "admin" {
   source  = "TaitoUnited/admin/google"
-  version = "3.2.1"
+  version = "3.2.2"
 
   project_id = local.project_id
 
@@ -276,10 +306,10 @@ module "databases" {
   ]
 
   source  = "TaitoUnited/databases/google"
-  version = "3.3.2"
+  version = "3.3.3"
 
   postgresql_clusters = values(local.postgresDatabasesById)
   mysql_clusters      = values(local.mysqlDatabasesById)
 
-  private_network_id = data.google_compute_network.vpc.id
+  private_network_id = try(data.google_compute_network.vpc[0].id, "private_network_id_not_set")
 }

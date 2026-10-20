@@ -114,6 +114,17 @@ resource "google_storage_bucket" "bucket" {
     }
   }
 
+  # AbortIncompleteMultipartUpload
+  lifecycle_rule {
+    action {
+      type = "AbortIncompleteMultipartUpload"
+    }
+
+    condition {
+      age = 1
+    }
+  }
+
   lifecycle {
     prevent_destroy = true
   }
@@ -123,6 +134,7 @@ resource "google_storage_bucket_iam_binding" "bucket_admin" {
   depends_on = [
     google_storage_bucket.bucket,
     module.admin.service_accounts,
+    google_service_account.service_account,
   ]
   for_each = local.bucketsById
   bucket   = each.value.name
@@ -142,6 +154,7 @@ resource "google_storage_bucket_iam_binding" "bucket_object_admin" {
   depends_on = [
     google_storage_bucket.bucket,
     module.admin.service_accounts,
+    google_service_account.service_account,
   ]
   for_each = local.bucketsById
   bucket   = each.value.name
@@ -161,6 +174,7 @@ resource "google_storage_bucket_iam_binding" "bucket_object_viewer" {
   depends_on = [
     google_storage_bucket.bucket,
     module.admin.service_accounts,
+    google_service_account.service_account,
   ]
   for_each = local.bucketsById
   bucket   = each.value.name

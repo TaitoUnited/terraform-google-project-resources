@@ -14,6 +14,20 @@
  * limitations under the License.
  */
 
+# Legacy flags for backwards compatilibity. Use these flags to avoid recreating existing resources unnecessarily.
+
+variable "use_legacy_service_accounts" {
+  type        = bool
+  default     = false
+  description = "If true, we don't use the service accounts provided by the admin module."
+}
+
+variable "use_legacy_registry" {
+  type        = bool
+  default     = false
+  description = "If true, Google artifact registry repositories will not be created and CI/CD not given artifact registry roles, because project is using registries that were migrated from the old Google container registry."
+}
+
 # Create flags
 
 # NOTE: NOT SUPPORTED BY THE GOOGLE MODULE
@@ -155,7 +169,7 @@ variable "infra_project_id" {
 variable "container_registry_project_id" {
   type        = string
   default     = ""
-  description = "Google Cloud project id for shared container registry. If not set, var.project_id will be used by default. The project should already exist."
+  description = "Google Cloud project id for shared container registry. If not set, var.infra_project_id will be used by default. The project should already exist."
 }
 
 # Project
@@ -301,6 +315,7 @@ variable "uptime_channels" {
 
 variable "certificate_map" {
   type        = string
+  default     = ""
   description = "If not empty, a certificate is created for each domain and added to this certificate map"
 }
 

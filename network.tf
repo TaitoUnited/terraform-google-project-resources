@@ -24,6 +24,8 @@ resource "google_compute_network" "vpc" {
 }
 
 data "google_compute_network" "vpc" {
+  count = var.private_network_name != "" ? 1 : 0
+
   name = var.private_network_name
 
   depends_on = [google_compute_network.vpc]
@@ -40,6 +42,8 @@ resource "google_compute_subnetwork" "container" {
 }
 
 data "google_compute_subnetwork" "container" {
+  count = var.private_container_subnetwork_name != "" ? 1 : 0
+
   name = var.private_container_subnetwork_name
 
   depends_on = [google_compute_subnetwork.container]

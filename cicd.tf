@@ -104,7 +104,7 @@ resource "google_project_iam_member" "cicd_cloudsql_client" {
 }
 
 resource "google_project_iam_member" "cicd_run_developer" {
-  count = var.create_cicd_service_account ? 1 : 0
+  count = var.create_cicd_service_account && local.cloudRunEnabled ? 1 : 0
 
   project = local.infra_project_id
   role    = "roles/run.developer"
@@ -120,7 +120,7 @@ resource "google_project_iam_member" "cicd_container_cluster_viewer" {
 }
 
 resource "google_artifact_registry_repository_iam_member" "cicd_artifact_registry_reader" {
-  count = var.create_cicd_service_account && var.create_container_image_repositories ? 1 : 0
+  count = !var.use_legacy_registry && var.create_cicd_service_account && var.create_container_image_repositories ? 1 : 0
 
   project    = google_artifact_registry_repository.container-repository[0].project
   location   = google_artifact_registry_repository.container-repository[0].location
@@ -131,7 +131,7 @@ resource "google_artifact_registry_repository_iam_member" "cicd_artifact_registr
 }
 
 resource "google_artifact_registry_repository_iam_member" "cicd_artifact_registry_writer" {
-  count = var.create_cicd_service_account && var.create_container_image_repositories ? 1 : 0
+  count = !var.use_legacy_registry && var.create_cicd_service_account && var.create_container_image_repositories ? 1 : 0
 
   project    = google_artifact_registry_repository.container-repository[0].project
   location   = google_artifact_registry_repository.container-repository[0].location
@@ -142,7 +142,7 @@ resource "google_artifact_registry_repository_iam_member" "cicd_artifact_registr
 }
 
 resource "google_artifact_registry_repository_iam_member" "cicd_artifact_registry_reader_other_env" {
-  count = var.create_cicd_service_account && var.create_container_image_repositories ? 0 : 1
+  count = var.use_legacy_registry || (var.create_cicd_service_account && var.create_container_image_repositories) ? 0 : 1
 
   project    = data.google_artifact_registry_repository.container-repository[0].project
   location   = data.google_artifact_registry_repository.container-repository[0].location
@@ -153,7 +153,7 @@ resource "google_artifact_registry_repository_iam_member" "cicd_artifact_registr
 }
 
 resource "google_artifact_registry_repository_iam_member" "cicd_artifact_registry_writer_other_env" {
-  count = var.create_cicd_service_account && var.create_container_image_repositories ? 0 : 1
+  count = var.use_legacy_registry || (var.create_cicd_service_account && var.create_container_image_repositories) ? 0 : 1
 
   project    = data.google_artifact_registry_repository.container-repository[0].project
   location   = data.google_artifact_registry_repository.container-repository[0].location

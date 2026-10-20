@@ -19,7 +19,7 @@ resource "google_artifact_registry_repository" "container-repository" {
     module.admin.apis,
   ]
 
-  count = var.create_container_image_repositories ? 1 : 0
+  count = var.create_container_image_repositories && !var.use_legacy_registry ? 1 : 0
 
   project       = local.container_registry_project_id
   repository_id = var.project
@@ -32,7 +32,7 @@ resource "google_artifact_registry_repository" "container-repository" {
 }
 
 data "google_artifact_registry_repository" "container-repository" {
-  count = !var.create_cicd_service_account || var.create_container_image_repositories ? 0 : 1
+  count = var.use_legacy_registry || !var.create_cicd_service_account || var.create_container_image_repositories ? 0 : 1
 
   project       = local.container_registry_project_id
   repository_id = var.project
