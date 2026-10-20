@@ -105,7 +105,11 @@ resource "google_compute_target_https_proxy" "app" {
 
   name            = "${var.project}-${var.env}"
   url_map         = google_compute_url_map.app[0].id
-  certificate_map = var.certificate_map # TODO: "//certificatemanager.googleapis.com/${google_certificate_manager_certificate_map.map.id}"
+  certificate_map = var.ingress_certificate_map_name # TODO: "//certificatemanager.googleapis.com/${google_certificate_manager_certificate_map.map.id}"
+
+  depends_on = [
+    google_certificate_manager_certificate_map.app,
+  ]
 }
 
 resource "google_compute_global_forwarding_rule" "app" {

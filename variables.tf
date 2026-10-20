@@ -34,43 +34,24 @@ variable "use_legacy_naming" {
   description = "If true, we use legacy naming for some of the legacy resources."
 }
 
-# Create flags
+# Create flags for resources typically shared between environments (created only once in each GCP project)
 
-# NOTE: NOT SUPPORTED BY THE GOOGLE MODULE
-# variable "create_domain" {
-#   type        = bool
-#   default     = false
-#   description = "If true, a DNS setup is created for each main domain."
-# }
-
-variable "create_domain_certificate" {
+variable "create_apis" {
   type        = bool
   default     = false
-  description = "If true, a domain certificate is created for each domain."
+  description = "If true, apis are created."
+}
+
+variable "create_permissions" {
+  type        = bool
+  default     = false
+  description = "If true, permissions are created."
 }
 
 variable "create_network" {
   type        = bool
   default     = false
   description = "If true, a private network is created."
-}
-
-variable "create_build_trigger" {
-  type        = bool
-  default     = false
-  description = "If true, build trigger will be created. If you enable this, you must also enable create_cicd_service_account."
-}
-
-variable "create_cicd_service_account" {
-  type        = bool
-  default     = false
-  description = "If true, ci/cd service account will be created."
-}
-
-variable "create_storage_buckets" {
-  type        = bool
-  default     = false
-  description = "If true, storage buckets are created."
 }
 
 variable "create_databases" {
@@ -85,10 +66,82 @@ variable "create_in_memory_databases" {
   description = "If true, in-memory databases are created. (TODO)"
 }
 
+# Create flags for resources typically shared between environments (created only once)
+
+variable "create_container_image_repositories" {
+  type        = bool
+  default     = false
+  description = "If true, container image repositories are created."
+}
+
+# Create flags for environment specific resources typically applied manually
+
+variable "create_build_trigger" {
+  type        = bool
+  default     = false
+  description = "If true, build trigger will be created. If you enable this, you must also enable create_cicd_service_account."
+}
+
+variable "create_cicd_service_account" {
+  type        = bool
+  default     = false
+  description = "If true, ci/cd service account will be created."
+}
+
+variable "create_service_accounts" {
+  type        = bool
+  default     = false
+  description = "If true, service accounts are created."
+}
+
+variable "create_api_keys" {
+  type        = bool
+  default     = false
+  description = "If true, api keys are created."
+}
+
+variable "create_ingress_certificate_map" {
+  type        = bool
+  default     = false
+  description = "If true, ingress certificate map is created."
+}
+
+variable "create_storage_buckets" {
+  type        = bool
+  default     = false
+  description = "If true, storage buckets are created."
+}
+
 variable "create_topics" {
   type        = bool
   default     = false
   description = "If true, topics are created. (TODO)"
+}
+
+variable "create_log_alert_metrics" {
+  type        = bool
+  default     = false
+  description = "If true, log metrics are created for all log alerts."
+}
+
+variable "create_log_alert_policies" {
+  type        = bool
+  default     = false
+  description = "If true, alert policies are created for log alerts"
+}
+
+variable "create_uptime_checks" {
+  type        = bool
+  default     = false
+  description = "If true, uptime check and alert is created for each service with uptime path set."
+}
+
+# Create flags for environment specific resources typically applied during CI/CD deploy
+
+variable "create_ingress_certificate" {
+  type        = bool
+  default     = false
+  description = "If true, ingress certificate is created for each domain."
 }
 
 variable "create_ingress" {
@@ -109,62 +162,36 @@ variable "create_functions" {
   description = "If true, functions are created. (TODO)"
 }
 
-# NOTE: NOT SUPPORTED BY THE GOOGLE MODULE
-# variable "create_function_permissions" {
-#   type        = bool
-#   default     = false
-#   description = "If true, function permissions are created."
-# }
+# Project
 
-variable "create_service_accounts" {
-  type        = bool
-  default     = false
-  description = "If true, service accounts are created."
+variable "project" {
+  type        = string
+  description = "Project name: e.g. \"my-project\". NOTE: This is not the name of the GCP project (one GCP project may contain multiple projects)."
 }
 
-variable "create_permissions" {
-  type        = bool
-  default     = false
-  description = "If true, permissions are created."
+variable "env" {
+  type        = string
+  description = "Environment: e.g. \"dev\""
 }
 
-variable "create_apis" {
-  type        = bool
-  default     = false
-  description = "If true, apis are created."
+variable "target_env" {
+  type        = string
+  default     = ""
+  description = "Target environment: e.g. \"pr-254\""
 }
 
-variable "create_api_keys" {
-  type        = bool
-  default     = false
-  description = "If true, api keys are created."
+# Cloud provider
+
+variable "project_id" {
+  type        = string
+  description = "Google Cloud project id for resources. The project should already exist."
 }
 
-variable "create_uptime_checks" {
-  type        = bool
-  default     = false
-  description = "If true, uptime check and alert is created for each service with uptime path set."
+variable "cicd_project_id" {
+  type        = string
+  default     = ""
+  description = "Google Cloud project id for CI/CD. If not set, var.infra_project_id will be used by default. The project should already exist."
 }
-
-variable "create_log_alert_metrics" {
-  type        = bool
-  default     = false
-  description = "If true, log metrics are created for all log alerts."
-}
-
-variable "create_log_alert_policies" {
-  type        = bool
-  default     = false
-  description = "If true, alert policies are created for log alerts"
-}
-
-variable "create_container_image_repositories" {
-  type        = bool
-  default     = false
-  description = "If true, container image repositories are created."
-}
-
-# Infra
 
 variable "infra_project_id" {
   type        = string
@@ -178,23 +205,15 @@ variable "container_registry_project_id" {
   description = "Google Cloud project id for shared container registry. If not set, var.infra_project_id will be used by default. The project should already exist."
 }
 
-# Project
-
-variable "project" {
+variable "log_alert_project_id" {
   type        = string
-  description = "Project name: e.g. \"my-project\". NOTE: This is not the name of the GCP project (one GCP project may contain multiple projects)."
+  default     = ""
+  description = "Google Cloud project id for log alerts. If not set, var.project_id will be used by default. The project should already exist."
 }
 
-variable "env" {
+variable "uptime_project_id" {
   type        = string
-  description = "Environment: e.g. \"dev\""
-}
-
-# Cloud provider
-
-variable "project_id" {
-  type        = string
-  description = "Google Cloud project id for resources. The project should already exist."
+  description = "Google Cloud project id for uptime monitoring. If not set, var.project_id will be used by default. The project should already exist."
 }
 
 variable "region" {
@@ -209,16 +228,24 @@ variable "zone" {
 
 # Network
 
-variable "private_network_name" {
+variable "vpc_name" {
   type        = string
   default     = ""
   description = "Private network for containers and database connectivity"
 }
 
-variable "private_container_subnetwork_name" {
+variable "vpc_container_subnet_name" {
   type        = string
   default     = ""
   description = "Private subnetwork for containers"
+}
+
+# Ingress
+
+variable "ingress_certificate_map_name" {
+  type        = string
+  default     = ""
+  description = "If not empty, a certificate is created for each domain and added to this certificate map"
 }
 
 # Version control
@@ -252,12 +279,6 @@ variable "vc_branch" {
 
 # CI/CD settings
 
-variable "cicd_project_id" {
-  type        = string
-  default     = ""
-  description = "Google Cloud project id for CI/CD. If not set, var.infra_project_id will be used by default. The project should already exist."
-}
-
 variable "cicd_file_path" {
   type        = string
   default     = ""
@@ -266,8 +287,8 @@ variable "cicd_file_path" {
 
 variable "cicd_location" {
   type        = string
-  default     = "global"
-  description = "CI/CD location"
+  default     = ""
+  description = "CI/CD location. By default the same as var.region."
 }
 
 variable "cicd_included_files" {
@@ -284,26 +305,13 @@ variable "cicd_ignored_files" {
 
 # Container registry settings
 
-variable "registry_immutable_tags" {
+variable "container_registry_immutable_tags" {
   type        = bool
   default     = true
-  description = "If true, container registry tags are immutable. This may cause problems if you use the latest tag for something."
+  description = "If true, artifact registry tags are immutable. This may cause problems if you use the latest tag for docker caching."
 }
 
-# Logging settings
-
-variable "log_alert_project_id" {
-  type        = string
-  default     = ""
-  description = "Google Cloud project id for log alerts. If not set, var.project_id will be used by default. The project should already exist."
-}
-
-# Uptime settings
-
-variable "uptime_project_id" {
-  type        = string
-  description = "Google Cloud project id for uptime monitoring. If not set, var.project_id will be used by default. The project should already exist."
-}
+# Monitoring settings
 
 variable "uptime_regions" {
   type        = list(string)
@@ -315,14 +323,6 @@ variable "uptime_channels" {
   type        = list(string)
   default     = []
   description = "SNS topics used to send alert notifications (e.g. \"arn:aws:sns:us-east-1:0123456789:my-zone-uptimez\")"
-}
-
-# Certificate
-
-variable "certificate_map" {
-  type        = string
-  default     = ""
-  description = "If not empty, a certificate is created for each domain and added to this certificate map"
 }
 
 # Resources as a json/yaml

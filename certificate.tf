@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
+resource "google_certificate_manager_certificate_map" "app" {
+  count      = var.create_ingress_certificate_map ? 1 : 0
+  name       = var.ingress_certificate_map_name
+}
+
 resource "google_certificate_manager_certificate" "certificate" {
   depends_on = [
     module.admin.apis,
+    google_certificate_manager_certificate_map.app,
   ]
 
-  for_each = { for item in(var.certificate_map != "" && var.create_domain_certificate ? local.allDomainNames : []) : item => item }
+  for_each = { for item in(var.ingress_certificate_map_name != "" && var.create_ingress_certificate ? local.allDomainNames : []) : item => item }
 
   name     = replace(each.value, ".", "-")
   location = "global"
@@ -31,18 +37,12 @@ resource "google_certificate_manager_certificate" "certificate" {
   }
 }
 
-/* TODO
-resource "google_certificate_manager_certificate_map" "app" {
-  name       = "${var.project}-${var.env}"
-}
-*/
-
 resource "google_certificate_manager_certificate_map_entry" "certificate" {
-  for_each = { for item in(var.certificate_map != "" && var.create_domain_certificate ? local.allDomainNames : []) : item => item }
+  for_each = { for item in(var.ingress_certificate_map_name != "" && var.create_ingress_certificate ? local.allDomainNames : []) : item => item }
 
   name     = replace(each.value, ".", "-")
   hostname = each.value
-  map      = var.certificate_map
+  map      = var.ingress_certificate_map_name
 
   certificates = [
     google_certificate_manager_certificate.certificate[each.key].id

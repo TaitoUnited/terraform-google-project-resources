@@ -17,16 +17,16 @@
 resource "google_compute_network" "vpc" {
   count = var.create_network ? 1 : 0
 
-  name                    = var.private_network_name
+  name                    = var.vpc_name
   auto_create_subnetworks = false
 
   depends_on = [module.admin.apis]
 }
 
 data "google_compute_network" "vpc" {
-  count = var.private_network_name != "" ? 1 : 0
+  count = var.vpc_name != "" ? 1 : 0
 
-  name = var.private_network_name
+  name = var.vpc_name
 
   depends_on = [google_compute_network.vpc]
 }
@@ -34,7 +34,7 @@ data "google_compute_network" "vpc" {
 resource "google_compute_subnetwork" "container" {
   count = var.create_network ? 1 : 0
 
-  name                     = var.private_container_subnetwork_name
+  name                     = var.vpc_container_subnet_name
   region                   = var.region
   network                  = google_compute_network.vpc[0].id
   ip_cidr_range            = "10.20.0.0/24"
@@ -42,9 +42,9 @@ resource "google_compute_subnetwork" "container" {
 }
 
 data "google_compute_subnetwork" "container" {
-  count = var.private_container_subnetwork_name != "" ? 1 : 0
+  count = var.vpc_container_subnet_name != "" ? 1 : 0
 
-  name = var.private_container_subnetwork_name
+  name = var.vpc_container_subnet_name
 
   depends_on = [google_compute_subnetwork.container]
 }

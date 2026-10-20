@@ -44,7 +44,7 @@ resource "google_cloudbuild_trigger" "cicd_trigger" {
 
   filename = coalesce(var.cicd_file_path, "cloudbuild.yaml")
 
-  location       = var.cicd_location
+  location       = coalesce(var.cicd_location, var.region)
   included_files = var.cicd_included_files
   ignored_files  = var.cicd_ignored_files
 }

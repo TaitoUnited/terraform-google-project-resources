@@ -191,30 +191,37 @@ services:
 With `create_*` variables you can choose which resources are created/updated in which phase. For example, you can choose to update some of the resources manually when the environment is created or updated:
 
 ```
+  # Resources shared between environments are created only once in each GCP project
+  create_apis                         = true
+  create_permissions                  = true
   create_network                      = true
-  create_domain_certificate           = true
-  create_container_image_repositories = true
-  create_build_trigger                = true
-  create_cicd_service_account         = true
-  create_storage_buckets              = true
   create_databases                    = true
   create_in_memory_databases          = true
-  create_topics                       = true
+
+  # All environments typically use the same container image repository
+  create_container_image_repositories = true
+
+  # Environment specific resources typically applied manually
+  create_build_trigger                = true
+  create_cicd_service_account         = true
   create_service_accounts             = true
-  create_permissions                  = true
-  create_apis                         = true
   create_api_keys                     = true
-  create_uptime_checks                = true
+  create_ingress_certificate_map      = true
+  create_storage_buckets              = true
+  create_topics                       = true
   create_log_alert_metrics            = true
   create_log_alert_policies           = true
+  create_uptime_checks                = true
 ```
 
 And choose to update ingress, containers, and functions on every deployment in your CI/CD pipeline:
 
 ```
-  create_ingress                 = true
-  create_containers              = true
-  create_functions               = true
+  # Environment specific resources created during CI/CD deploy
+  create_ingress_certificate          = true
+  create_ingress                      = true
+  create_containers                   = true
+  create_functions                    = true
 ```
 
 Similar YAML format is used also by the following modules:
