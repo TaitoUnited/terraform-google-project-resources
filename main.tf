@@ -34,9 +34,7 @@ locals {
   infra_project_id              = coalesce(var.infra_project_id, local.project_id)
   container_registry_project_id = coalesce(var.container_registry_project_id, var.infra_project_id, local.project_id)
 
-  cicd_project_id = (
-    var.cicd_project_id != null && var.cicd_project_id != "" ? var.cicd_project_id : var.project_id
-  )
+  cicd_project_id               = coalesce(var.cicd_project_id, var.infra_project_id, var.project_id)
 
   log_alert_project_id = (
     var.log_alert_project_id != null && var.log_alert_project_id != "" ? var.log_alert_project_id : var.project_id
@@ -64,13 +62,13 @@ locals {
 
   serviceAccountsById = var.use_legacy_service_accounts ? {} : {
     for item in coalesce(try(var.resources.auth.serviceAccounts, []), []) :
-    "${item.name}-${coalesce(item.provider, "gcp")}" => item
+    var.use_legacy_naming ? item.name : "${item.name}-${coalesce(item.provider, "gcp")}" => item
     if var.create_service_accounts && coalesce(item.provider, "gcp") == "gcp"
   }
 
   legacyServiceAccountsById = var.use_legacy_service_accounts ? {
     for acc in coalesce(try(var.resources.auth.serviceAccounts, []), []):
-    "${acc.name}-${coalesce(acc.provider, "gcp")}" => acc
+    var.use_legacy_naming ? acc.name : "${acc.name}-${coalesce(acc.provider, "gcp")}" => acc
     if var.create_service_accounts && coalesce(acc.provider, "gcp") == "gcp"
   } : {}
 

@@ -28,6 +28,12 @@ variable "use_legacy_registry" {
   description = "If true, Google artifact registry repositories will not be created and CI/CD not given artifact registry roles, because project is using registries that were migrated from the old Google container registry."
 }
 
+variable "use_legacy_naming" {
+  type        = bool
+  default     = false
+  description = "If true, we use legacy naming for some of the legacy resources."
+}
+
 # Create flags
 
 # NOTE: NOT SUPPORTED BY THE GOOGLE MODULE
@@ -249,7 +255,7 @@ variable "vc_branch" {
 variable "cicd_project_id" {
   type        = string
   default     = ""
-  description = "Google Cloud project id for CI/CD. If not set, var.project_id will be used by default. The project should already exist."
+  description = "Google Cloud project id for CI/CD. If not set, var.infra_project_id will be used by default. The project should already exist."
 }
 
 variable "cicd_file_path" {
