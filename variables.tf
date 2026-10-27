@@ -467,6 +467,10 @@ variable "resources" {
         secretEnv    = optional(map(string))
       })))
 
+      db = optional(map(object({
+        useProxy     = optional(bool, false)
+        instance     = optional(string)
+      })))
     })))
   })
   description = "Resources as JSON (see README.md). You can read values from a YAML file with yamldecode()."

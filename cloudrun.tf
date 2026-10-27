@@ -136,6 +136,28 @@ resource "google_cloud_run_v2_service" "container" {
           failure_threshold     = 3
         }
       }
+
+      # Database proxy
+      dynamic "volume_mounts" {
+        for_each = try(each.value.db.useProxy, false) ? [1] : [0]
+
+        content {
+          name = "cloudsql"
+          mount_path = "/cloudsql"
+        }
+      }
+    }
+
+    # Database proxy
+    dynamic "volumes" {
+      for_each = try(each.value.db.useProxy, false) ? [1] : [0]
+
+      content {
+        name = "cloudsql"
+        cloud_sql_instance {
+          instances = [each.value.db.instance]
+        }
+      }
     }
 
     vpc_access {

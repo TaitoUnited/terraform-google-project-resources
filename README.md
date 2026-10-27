@@ -96,15 +96,19 @@ services:
           ERP_PASSWORD: my-project-prod-erp.password
 
   worker:
-    type: container # TODO: implement
+    type: container
     image: my-registry/my-worker:1234
     replicas: 2
     memoryRequest: 128
+    db:
+      useProxy: true
+      instance: my-infra-dev:europe-west1:common-postgres
     secrets:
       SERVICE_ACCOUNT_KEY: my-project-prod-worker-serviceaccount.key
     env:
       TOPIC_JOBS: my-project-prod-jobs
       STORAGE_BUCKET: my-project-prod
+      DATABASE_HOST: /cloudsql/my-infra-dev:europe-west1:common-postgres
 
   jobs:
     type: topic # TODO: implement
