@@ -15,16 +15,16 @@
  */
 
 resource "google_service_account" "service_account" {
-  for_each     = local.legacyServiceAccountsById
+  for_each = local.legacyServiceAccountsById
 
   account_id   = each.value.name
   display_name = each.value.name
 }
 
 resource "google_project_iam_member" "service_account_role" {
-  for_each     = local.legacyServiceAccountRolesByKey
+  for_each = local.legacyServiceAccountRolesByKey
 
-  project      = var.project_id
-  role         = each.value.role
-  member       = "serviceAccount:${google_service_account.service_account[each.value.id].email}"
+  project = var.project_id
+  role    = each.value.role
+  member  = "serviceAccount:${google_service_account.service_account[each.value.id].email}"
 }

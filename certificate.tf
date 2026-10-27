@@ -15,8 +15,8 @@
  */
 
 resource "google_certificate_manager_certificate_map" "app" {
-  count      = var.create_ingress_certificate_map ? 1 : 0
-  name       = var.ingress_certificate_map_name
+  count = var.create_ingress_certificate_map ? 1 : 0
+  name  = var.ingress_certificate_map_name
 }
 
 resource "google_certificate_manager_certificate" "certificate" {

@@ -486,8 +486,8 @@ variable "resources" {
       })))
 
       db = optional(map(object({
-        useProxy     = optional(bool, false)
-        instance     = optional(string)
+        useProxy = optional(bool, false)
+        instance = optional(string)
       })))
     })))
   })

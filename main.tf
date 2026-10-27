@@ -34,7 +34,7 @@ locals {
   infra_project_id              = coalesce(var.infra_project_id, local.project_id)
   container_registry_project_id = coalesce(var.container_registry_project_id, var.infra_project_id, local.project_id)
 
-  cicd_project_id               = coalesce(var.cicd_project_id, var.infra_project_id, var.project_id)
+  cicd_project_id = coalesce(var.cicd_project_id, var.infra_project_id, var.project_id)
 
   log_alert_project_id = (
     var.log_alert_project_id != null && var.log_alert_project_id != "" ? var.log_alert_project_id : var.project_id
@@ -67,26 +67,26 @@ locals {
   }
 
   legacyServiceAccountsById = var.use_legacy_service_accounts ? {
-    for acc in coalesce(try(var.resources.auth.serviceAccounts, []), []):
+    for acc in coalesce(try(var.resources.auth.serviceAccounts, []), []) :
     var.use_legacy_naming ? acc.name : "${acc.name}-${coalesce(acc.provider, "gcp")}" => acc
     if var.create_service_accounts && coalesce(acc.provider, "gcp") == "gcp"
   } : {}
 
   legacyServiceAccountRoles = flatten([
-    for id, serviceAccount in local.legacyServiceAccountsById: [
-      for role in serviceAccount.roles:
+    for id, serviceAccount in local.legacyServiceAccountsById : [
+      for role in serviceAccount.roles :
       {
-        id = id
-        role = role
+        id             = id
+        role           = role
         serviceAccount = serviceAccount
       }
     ]
   ])
 
   legacyServiceAccountRolesByKey = {
-    for r in local.legacyServiceAccountRoles:
+    for r in local.legacyServiceAccountRoles :
     "${r.id}-${r.role}" => r
-  }  
+  }
 
   # API keys
 
@@ -221,7 +221,7 @@ locals {
       ]
     ]) : item.id => item
   }
-  
+
   # Cloud run
 
   cloudRunEnabled = length(local.containersById) > 0 || length(local.containerCronJobsById) > 0

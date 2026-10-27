@@ -26,7 +26,7 @@ resource "google_service_account" "container" {
 data "google_service_account" "container" {
   for_each = local.containersById
 
-  account_id   = "${var.project}-${var.env}-${each.key}"
+  account_id = "${var.project}-${var.env}-${each.key}"
 
   depends_on = [google_service_account.container]
 }
@@ -150,7 +150,7 @@ resource "google_cloud_run_v2_service" "container" {
         for_each = try(each.value.db.useProxy, false) ? [1] : [0]
 
         content {
-          name = "cloudsql"
+          name       = "cloudsql"
           mount_path = "/cloudsql"
         }
       }
