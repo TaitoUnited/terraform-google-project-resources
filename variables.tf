@@ -112,6 +112,18 @@ variable "create_ingress_certificate_map" {
   description = "If true, ingress certificate map is created."
 }
 
+variable "create_container_permissions" {
+  type        = bool
+  default     = false
+  description = "If true, container service accounts and permissions are created."
+}
+
+variable "create_function_permissions" {
+  type        = bool
+  default     = false
+  description = "If true, function service accounts and permissions are created. (TODO)"
+}
+
 variable "create_storage_buckets" {
   type        = bool
   default     = false

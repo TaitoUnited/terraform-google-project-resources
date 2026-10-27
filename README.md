@@ -212,6 +212,8 @@ With `create_*` variables you can choose which resources are created/updated in 
   create_api_keys                     = true
   create_ingress_certificate_map      = true
   create_ingress                      = true
+  create_container_permissions        = true
+  create_functions_permissions        = true
   create_storage_buckets              = true
   create_topics                       = true
   create_log_alert_metrics            = true

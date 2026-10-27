@@ -15,7 +15,7 @@
  */
 
 resource "google_service_account" "container" {
-  for_each = local.containersById
+  for_each = var.create_container_permissions ? local.containersById : {}
 
   account_id   = "${var.project}-${var.env}-${each.key}"
   display_name = "${var.project}-${var.env}-${each.key}"
@@ -23,8 +23,16 @@ resource "google_service_account" "container" {
   depends_on = [module.admin.apis]
 }
 
+data "google_service_account" "container" {
+  for_each = local.containersById
+
+  account_id   = "${var.project}-${var.env}-${each.key}"
+
+  depends_on = [google_service_account.container]
+}
+
 resource "google_secret_manager_secret_iam_member" "container" {
-  for_each = local.containerSecretsById
+  for_each = var.create_container_permissions ? local.containerSecretsById : {}
 
   secret_id = each.value.secretName
   role      = "roles/secretmanager.secretAccessor"
@@ -46,7 +54,7 @@ resource "google_cloud_run_v2_service" "container" {
   deletion_protection = false
 
   template {
-    service_account = google_service_account.container[each.key].email
+    service_account = data.google_service_account.container[each.key].email
 
     containers {
       image = each.value.image
@@ -191,7 +199,7 @@ resource "google_cloud_run_v2_job" "cronjob" {
 
   template {
     template {
-      service_account = google_service_account.container[each.value.container.id].email
+      service_account = data.google_service_account.container[each.value.container.id].email
 
       containers {
         image = each.value.container.image
