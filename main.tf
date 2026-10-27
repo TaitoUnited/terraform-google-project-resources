@@ -189,25 +189,6 @@ locals {
     ]) : cronjob.id => cronjob
   }
 
-  containersWithPathById = {
-    for id, container in local.containersById :
-    id => container
-    if var.create_ingress && length(coalesce(try(container.paths, null), [])) > 0
-  }
-
-  containerPathsById = {
-    for item in flatten([
-      for containerId, container in local.containersWithPathById : [
-        for item in container.paths :
-        {
-          id          = "${containerId}-${item.path}"
-          containerId = containerId
-          path        = item.path
-        }
-      ]
-    ]) : item.id => item
-  }
-
   functionsById = {
     for name, service in local.servicesById :
     name => service
@@ -219,6 +200,27 @@ locals {
   #   name => service
   #   if var.create_function_permissions && service.type == "function"
   # }
+
+  # Services with ingress
+
+  ingressContainersById = {
+    for id, container in local.containersById :
+    id => container
+    if var.create_ingress_routes && local.ingress.enabled && length(coalesce(try(container.paths, null), [])) > 0
+  }
+
+  ingressContainerPathsById = {
+    for item in flatten([
+      for containerId, container in local.ingressContainersById : [
+        for item in container.paths :
+        {
+          id          = "${containerId}-${item.path}"
+          containerId = containerId
+          path        = item.path
+        }
+      ]
+    ]) : item.id => item
+  }
   
   # Cloud run
 
@@ -255,36 +257,6 @@ locals {
     name => service
     if var.create_storage_buckets && service.type == "bucket"
   }
-
-  ingressFunctionsById = {
-    for name, service in local.servicesById :
-    name => service
-    if var.create_ingress && local.ingress.enabled && service.type == "function" && service.path != null
-  }
-
-  ingressStaticContentsById = {
-    for name, service in local.servicesById :
-    name => service
-    if var.create_ingress && local.ingress.enabled && service.type == "static"
-  }
-
-  ingressRootStaticContentsById = {
-    for name, service in local.ingressStaticContentsById :
-    name => service
-    if var.create_ingress && local.ingress.enabled && service.path != null && coalesce(service.path, "") == "/"
-  }
-
-  ingressChildStaticContentsById = {
-    for name, service in local.ingressStaticContentsById :
-    name => service
-    if var.create_ingress && local.ingress.enabled && service.path != null && coalesce(service.path, "") != "/"
-  }
-
-  ingressEnabled = length(concat(
-    values(local.ingressFunctionsById),
-    values(local.ingressStaticContentsById),
-  )) > 0
-
 }
 
 module "admin" {

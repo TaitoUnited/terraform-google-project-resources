@@ -211,6 +211,7 @@ With `create_*` variables you can choose which resources are created/updated in 
   create_service_accounts             = true
   create_api_keys                     = true
   create_ingress_certificate_map      = true
+  create_ingress                      = true
   create_storage_buckets              = true
   create_topics                       = true
   create_log_alert_metrics            = true
@@ -222,8 +223,8 @@ And choose to update ingress, containers, and functions on every deployment in y
 
 ```
   # Environment specific resources created during CI/CD deploy
+  create_ingress_routes               = true
   create_ingress_certificate          = true
-  create_ingress                      = true
   create_containers                   = true
   create_functions                    = true
 ```

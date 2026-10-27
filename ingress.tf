@@ -16,7 +16,7 @@
 
 # Route paths to container backend services
 resource "google_compute_url_map" "app" {
-  count = length(local.containerPathsById) > 0 ? 1 : 0
+  count = length(local.ingressContainerPathsById) > 0 ? 1 : 0
 
   name = "${var.project}-${var.env}"
 
@@ -35,7 +35,7 @@ resource "google_compute_url_map" "app" {
     name = "app-paths"
 
     dynamic "path_rule" {
-      for_each = local.containerPathsById
+      for_each = local.ingressContainerPathsById
 
       content {
         service = google_compute_backend_service.container[path_rule.value.containerId].id
@@ -59,7 +59,7 @@ resource "google_compute_url_map" "app" {
 
 # Container backend services
 resource "google_compute_backend_service" "container" {
-  for_each = local.containersWithPathById
+  for_each = local.ingressContainersById
 
   name                  = "${var.project}-${var.env}-${each.key}"
   protocol              = "HTTP"
@@ -72,7 +72,7 @@ resource "google_compute_backend_service" "container" {
 
 # Serverless NEGs connect the load balancer to Cloud Run
 resource "google_compute_region_network_endpoint_group" "container" {
-  for_each = local.containersWithPathById
+  for_each = local.ingressContainersById
 
   name                  = "${var.project}-${var.env}-${each.key}"
   region                = var.region
@@ -85,7 +85,7 @@ resource "google_compute_region_network_endpoint_group" "container" {
 
 # Allow public access to container endpoints that have path set
 resource "google_cloud_run_v2_service_iam_member" "public_invoker" {
-  for_each = local.containersWithPathById
+  for_each = local.ingressContainersById
 
   location = var.region
   name     = google_cloud_run_v2_service.container[each.key].name
@@ -95,13 +95,13 @@ resource "google_cloud_run_v2_service_iam_member" "public_invoker" {
 }
 
 resource "google_compute_global_address" "app" {
-  count = var.create_ingress ? 1 : 0
+  count = var.create_ingress && local.ingress.enabled ? 1 : 0
 
   name = "${var.project}-${var.env}"
 }
 
 resource "google_compute_target_https_proxy" "app" {
-  count = var.create_ingress ? 1 : 0
+  count = var.create_ingress && local.ingress.enabled ? 1 : 0
 
   name            = "${var.project}-${var.env}"
   url_map         = google_compute_url_map.app[0].id
@@ -113,7 +113,7 @@ resource "google_compute_target_https_proxy" "app" {
 }
 
 resource "google_compute_global_forwarding_rule" "app" {
-  count = var.create_ingress ? 1 : 0
+  count = var.create_ingress && local.ingress.enabled ? 1 : 0
 
   name                  = "${var.project}-${var.env}"
   ip_address            = google_compute_global_address.app[0].address

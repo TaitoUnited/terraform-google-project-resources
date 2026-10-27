@@ -100,6 +100,12 @@ variable "create_api_keys" {
   description = "If true, api keys are created."
 }
 
+variable "create_ingress" {
+  type        = bool
+  default     = false
+  description = "If true, ingress is created."
+}
+
 variable "create_ingress_certificate_map" {
   type        = bool
   default     = false
@@ -138,16 +144,16 @@ variable "create_uptime_checks" {
 
 # Create flags for environment specific resources typically applied during CI/CD deploy
 
+variable "create_ingress_routes" {
+  type        = bool
+  default     = false
+  description = "If true, ingress routes are created are created for all services with path."
+}
+
 variable "create_ingress_certificate" {
   type        = bool
   default     = false
   description = "If true, ingress certificate is created for each domain."
-}
-
-variable "create_ingress" {
-  type        = bool
-  default     = false
-  description = "If true, ingress is created."
 }
 
 variable "create_containers" {
