@@ -144,6 +144,10 @@ locals {
     )
   ]
 
+  # PR and canary env support: If target_env is different from env,
+  # the target_env doesn't own the url map
+  envOwnsIngressUrlMap = coalesce(var.target_env, var.env) == var.env
+
   # Services
 
   services = coalesce(var.resources.services, {})

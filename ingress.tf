@@ -16,23 +16,23 @@
 
 # Route paths to container backend services
 resource "google_compute_url_map" "app" {
-  count = length(local.ingressContainerPathsById) > 0 ? 1 : 0
+  count = local.envOwnsIngressUrlMap && length(local.ingressContainerPathsById) > 0 ? 1 : 0
 
   name = "${var.project}-${var.env}"
 
   host_rule {
     hosts        = local.allDomainNames
-    path_matcher = "app-paths"
+    path_matcher = var.env
   }
 
   default_url_redirect {
     https_redirect = true
-    path_redirect  = "/"
-    strip_query    = true
+    strip_query    = false
   }
 
   path_matcher {
-    name = "app-paths"
+    name            = var.env
+    default_service = google_compute_backend_service.container[values(local.ingressContainersById)[0]].id
 
     dynamic "path_rule" {
       for_each = local.ingressContainerPathsById
@@ -54,6 +54,55 @@ resource "google_compute_url_map" "app" {
         # TODO: add test {}
       }
     }
+  }
+
+  lifecycle {
+    # Ignore route changes made by PR environments
+    ignore_changes = all
+  }
+}
+
+resource "terraform_data" "google_compute_url_map_update" {
+  count = !local.envOwnsIngressUrlMap && length(local.ingressContainerPathsById) > 0 ? 1 : 0
+
+  input = {
+    project_id = var.project_id
+    project    = var.project
+    env        = var.env
+    target_env = var.target_env
+    hosts      = join(",", local.allDomainNames)
+
+    default_service = google_compute_backend_service.container[values(local.ingressContainersById)[0]].id
+
+    backend_service_path_rules = join(",", flatten([
+      for itemId, item in local.ingressContainerPathsById : [
+        "${item.path}=${google_compute_backend_service.container[item.containerId].id}",
+        "${item.path}/*=${google_compute_backend_service.container[item.containerId].id}",
+      ]
+    ]))
+  }
+
+  provisioner "local-exec" {
+    # TODO: add support for path_prefix_rewrite = "/"
+    command = <<-EOT
+      gcloud compute url-maps add-path-matcher ${self.input.project}-${self.input.env} \
+        --project=${self.input.project_id} \
+        --path-matcher-name=${self.input.target_env} \
+        --global \
+        --new-hosts=${self.input.hosts} \
+        --default-service=${self.input.default_service} \
+        --backend-service-path-rules=${self.input.backend_service_path_rules}
+    EOT
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = <<-EOT
+      gcloud compute url-maps remove-path-matcher ${self.input.project}-${self.input.env} \
+        --project=${self.input.project_id} \
+        --path-matcher-name=${self.input.target_env} \
+        --global
+    EOT
   }
 }
 
