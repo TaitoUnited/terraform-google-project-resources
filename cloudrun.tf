@@ -184,6 +184,8 @@ resource "google_cloud_run_v2_service" "container" {
 
   depends_on = [
     module.admin.apis,
+    module.databases.postgresql_clusters,
+    module.databases.mysql_clusters,
   ]
 }
 
