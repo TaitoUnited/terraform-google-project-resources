@@ -100,7 +100,7 @@ resource "google_cloud_run_v2_service" "container" {
 
         content {
           name  = "${upper(replace(target.key, "-", "_"))}_URL"
-          value = "https://${var.project}-${var.env}-${target.key}-${google_project.project.number}.${var.region}.run.app"
+          value = "https://${var.project}-${var.env}-${target.key}-${data.google_project.project.number}.${var.region}.run.app"
         }
       }
 
@@ -145,7 +145,7 @@ resource "google_cloud_run_v2_service" "container" {
 
       # Database proxy
       dynamic "volume_mounts" {
-        for_each = try(each.value.db.useProxy, false) ? [1] : [0]
+        for_each = each.value.db.useProxy ? [1] : []
 
         content {
           name       = "cloudsql"
@@ -156,12 +156,13 @@ resource "google_cloud_run_v2_service" "container" {
 
     # Database proxy
     dynamic "volumes" {
-      for_each = try(each.value.db.useProxy, false) ? [1] : [0]
+      for_each = each.value.db.useProxy ? [1] : []
+      iterator = dummy
 
       content {
         name = "cloudsql"
         cloud_sql_instance {
-          instances = [each.value.db.instance]
+          instances = [ach.value.db.instance]
         }
       }
     }

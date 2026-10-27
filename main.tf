@@ -26,6 +26,10 @@ provider "google-beta" {
   zone    = var.zone
 }
 
+data "google_project" "project" {
+  project_id = var.project_id
+}
+
 locals {
 
   # Projects

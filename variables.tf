@@ -422,7 +422,7 @@ variable "resources" {
       highAvailabilityEnabled    = optional(bool)
       publicIpEnabled            = optional(bool)
       authorizedNetworks         = optional(list(string))
-      flags                      = optional(map(string))
+      flags                      = optional(map(string), {})
       adminUsername              = optional(string)
 
       storageClass = optional(string)
@@ -467,9 +467,9 @@ variable "resources" {
       timeout       = optional(number)
       runtime       = optional(string)
       memoryRequest = optional(number)
-      secrets       = optional(map(string))
-      secretEnv     = optional(map(string))
-      env           = optional(map(string))
+      secrets       = optional(map(string), {})
+      secretEnv     = optional(map(string), {})
+      env           = optional(map(string), {})
       publishers = optional(list(object({
         id = string
       })))
@@ -481,14 +481,14 @@ variable "resources" {
         schedule     = string
         timeZone     = optional(string)
         shellCommand = string
-        env          = optional(map(string))
-        secretEnv    = optional(map(string))
-      })))
+        env          = optional(map(string), {})
+        secretEnv    = optional(map(string), {})
+      })), {})
 
-      db = optional(map(object({
+      db = optional(object({
         useProxy = optional(bool, false)
         instance = optional(string)
-      })))
+      }), { useProxy = false })
     })))
   })
   description = "Resources as JSON (see README.md). You can read values from a YAML file with yamldecode()."
