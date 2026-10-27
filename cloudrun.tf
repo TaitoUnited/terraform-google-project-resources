@@ -95,7 +95,7 @@ resource "google_cloud_run_v2_service" "container" {
           for key, container in local.containersById :
           key => container
           if key != each.key
-        }        
+        }
         iterator = target
 
         content {
