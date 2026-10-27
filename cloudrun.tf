@@ -90,7 +90,6 @@ resource "google_cloud_run_v2_service" "container" {
       }
 
       # Populate cloud run service urls of other services as environment variables
-      /* TODO: resolve cycle
       dynamic "env" {
         for_each = {
           for key, container in local.containersById :
@@ -101,10 +100,9 @@ resource "google_cloud_run_v2_service" "container" {
 
         content {
           name  = "${upper(replace(target.key, "-", "_"))}_URL"
-          value = google_cloud_run_v2_service.container[target.key].uri
+          value = "https://${var.project}-${var.env}-${target.key}-${google_project.project.number}.${var.region}.run.app"
         }
       }
-      */
 
       resources {
         limits = {
