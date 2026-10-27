@@ -376,14 +376,14 @@ variable "resources" {
 
     ingress = optional(object({
       class            = optional(string)
-      enabled          = optional(bool)
-      createMainDomain = optional(bool)
-      domains = list(object({
+      enabled          = optional(bool, false)
+      createMainDomain = optional(bool, false)
+      domains = optional(list(object({
         name = string
         altDomains = list(object({
           name = string
         }))
-      }))
+      })))
     }))
 
     services = optional(map(object({
