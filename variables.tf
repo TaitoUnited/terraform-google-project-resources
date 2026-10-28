@@ -231,6 +231,7 @@ variable "log_alert_project_id" {
 
 variable "uptime_project_id" {
   type        = string
+  default     = ""
   description = "Google Cloud project id for uptime monitoring. If not set, var.project_id will be used by default. The project should already exist."
 }
 
@@ -270,16 +271,19 @@ variable "ingress_certificate_map_name" {
 
 variable "vc_provider" {
   type        = string
+  default     = ""
   description = "Version control provider (e.g. github)"
 }
 
 variable "vc_organization" {
   type        = string
+  default     = ""
   description = "Version control organization"
 }
 
 variable "vc_repository" {
   type        = string
+  default     = ""
   description = "Version control repository name"
 }
 
@@ -292,6 +296,7 @@ variable "vc_repo" {
 
 variable "vc_branch" {
   type        = string
+  default     = ""
   description = "Branch: e.g. \"dev\""
 }
 

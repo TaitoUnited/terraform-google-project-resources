@@ -142,7 +142,8 @@ resource "google_artifact_registry_repository_iam_member" "cicd_artifact_registr
 }
 
 resource "google_artifact_registry_repository_iam_member" "cicd_artifact_registry_reader_other_env" {
-  count = var.use_legacy_registry || (var.create_cicd_service_account && var.create_container_image_repositories) ? 0 : 1
+  # HACK: build_image_tag check to allow gcp-deploy
+  count = var.build_image_tag != "" || var.use_legacy_registry || (var.create_cicd_service_account && var.create_container_image_repositories) ? 0 : 1
 
   project    = data.google_artifact_registry_repository.container-repository.project
   location   = data.google_artifact_registry_repository.container-repository.location
@@ -153,7 +154,8 @@ resource "google_artifact_registry_repository_iam_member" "cicd_artifact_registr
 }
 
 resource "google_artifact_registry_repository_iam_member" "cicd_artifact_registry_writer_other_env" {
-  count = var.use_legacy_registry || (var.create_cicd_service_account && var.create_container_image_repositories) ? 0 : 1
+  # HACK: build_image_tag check to allow gcp-deploy
+  count = var.build_image_tag != "" || var.use_legacy_registry || (var.create_cicd_service_account && var.create_container_image_repositories) ? 0 : 1
 
   project    = data.google_artifact_registry_repository.container-repository.project
   location   = data.google_artifact_registry_repository.container-repository.location
