@@ -112,7 +112,7 @@ resource "terraform_data" "google_compute_url_map_update" {
 resource "google_compute_backend_service" "container" {
   for_each = local.ingressContainersById
 
-  name                  = "${var.project}-${var.env}-${each.key}"
+  name                  = "${var.project}-${var.target_env}-${each.key}"
   protocol              = "HTTP"
   load_balancing_scheme = "EXTERNAL_MANAGED"
 
@@ -125,7 +125,7 @@ resource "google_compute_backend_service" "container" {
 resource "google_compute_region_network_endpoint_group" "container" {
   for_each = local.ingressContainersById
 
-  name                  = "${var.project}-${var.env}-${each.key}"
+  name                  = "${var.project}-${var.target_env}-${each.key}"
   region                = var.region
   network_endpoint_type = "SERVERLESS"
 

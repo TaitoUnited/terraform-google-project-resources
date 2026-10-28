@@ -171,7 +171,7 @@ locals {
   containersById = {
     for name, service in local.servicesById :
     name => merge(service, { id = name })
-    if var.create_containers && service.type == "container"
+    if service.type == "container"
   }
 
   containerSecretsById = {
@@ -200,7 +200,7 @@ locals {
   functionsById = {
     for name, service in local.servicesById :
     name => service
-    if var.create_functions && service.type == "function"
+    if service.type == "function"
   }
 
   # functionsForPermissionsById = {

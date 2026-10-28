@@ -49,8 +49,8 @@ resource "google_secret_manager_secret_iam_member" "container" {
 }
 
 resource "google_cloud_run_v2_service" "container" {
-  for_each = local.containersById
-  name     = "${var.project}-${var.env}-${each.key}"
+  for_each = var.create_containers ? local.containersById : {}
+  name     = "${var.project}-${var.target_env}-${each.key}"
   location = var.region
 
   # Allow traffic through the external Application Load Balancer,
@@ -241,8 +241,8 @@ resource "google_cloud_run_v2_service" "container" {
 /* ---- Cron job ----- */
 
 resource "google_cloud_run_v2_job" "cronjob" {
-  for_each = local.containerCronJobsById
-  name     = "${var.project}-${var.env}-${each.key}"
+  for_each = var.create_containers ? local.containerCronJobsById : {}
+  name     = "${var.project}-${var.target_env}-${each.key}"
   location = var.region
 
   deletion_protection = false
