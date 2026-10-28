@@ -418,6 +418,9 @@ variable "resources" {
       name        = optional(string)
       location    = optional(string)
 
+      cpuLimit    = optional(string)
+      memoryLimit = optional(string)
+
       paths = optional(list(object({
         path = string
       })))
