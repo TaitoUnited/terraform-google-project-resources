@@ -393,7 +393,7 @@ variable "resources" {
         name     = string
         origins  = optional(list(string))
         services = list(object({
-          name    = string
+          id      = string
           methods = optional(list(string))
         }))
       })))

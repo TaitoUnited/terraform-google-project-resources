@@ -19,16 +19,16 @@ resource "google_apikeys_key" "api_key" {
     module.admin.apis,
   ]
 
-  for_each = { for item in local.apiKeysById : item.id => item }
+  for_each = { for item in local.apiKeysById : item.name => item }
 
   name         = each.value.name
   display_name = each.value.name
 
   restrictions {
     dynamic "api_targets" {
-      for_each = { for item in each.value.services : item.name => item }
+      for_each = { for item in each.value.services : item.id => item }
       content {
-        service = api_targets.value.name
+        service = api_targets.value.id
         methods = coalesce(api_targets.value.methods, ["GET*"])
       }
     }
