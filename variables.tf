@@ -343,6 +343,14 @@ variable "uptime_channels" {
   description = "SNS topics used to send alert notifications (e.g. \"arn:aws:sns:us-east-1:0123456789:my-zone-uptimez\")"
 }
 
+# Build info
+
+variable "build_image_tag" {
+  type        = string
+  default     = ""
+  description = "For example git commit hash (ddee8c8da71393b4b2ef95de507358abe54d7e78). Required if create_containers or create_functions is true."
+}
+
 # Resources as a json/yaml
 
 variable "resources" {

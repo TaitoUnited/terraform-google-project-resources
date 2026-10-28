@@ -144,9 +144,9 @@ resource "google_artifact_registry_repository_iam_member" "cicd_artifact_registr
 resource "google_artifact_registry_repository_iam_member" "cicd_artifact_registry_reader_other_env" {
   count = var.use_legacy_registry || (var.create_cicd_service_account && var.create_container_image_repositories) ? 0 : 1
 
-  project    = data.google_artifact_registry_repository.container-repository[0].project
-  location   = data.google_artifact_registry_repository.container-repository[0].location
-  repository = data.google_artifact_registry_repository.container-repository[0].name
+  project    = data.google_artifact_registry_repository.container-repository.project
+  location   = data.google_artifact_registry_repository.container-repository.location
+  repository = data.google_artifact_registry_repository.container-repository.name
 
   role   = "roles/artifactregistry.reader"
   member = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
@@ -155,9 +155,9 @@ resource "google_artifact_registry_repository_iam_member" "cicd_artifact_registr
 resource "google_artifact_registry_repository_iam_member" "cicd_artifact_registry_writer_other_env" {
   count = var.use_legacy_registry || (var.create_cicd_service_account && var.create_container_image_repositories) ? 0 : 1
 
-  project    = data.google_artifact_registry_repository.container-repository[0].project
-  location   = data.google_artifact_registry_repository.container-repository[0].location
-  repository = data.google_artifact_registry_repository.container-repository[0].name
+  project    = data.google_artifact_registry_repository.container-repository.project
+  location   = data.google_artifact_registry_repository.container-repository.location
+  repository = data.google_artifact_registry_repository.container-repository.name
 
   role   = "roles/artifactregistry.writer"
   member = "serviceAccount:${google_service_account.cicd_service_account[0].email}"

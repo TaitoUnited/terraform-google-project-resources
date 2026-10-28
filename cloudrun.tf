@@ -57,7 +57,15 @@ resource "google_cloud_run_v2_service" "container" {
     service_account = data.google_service_account.container[each.key].email
 
     containers {
-      image = each.value.image
+      image = (
+        each.value.image != null && strcontains(each.value.image, "/")
+        ? each.value.image
+        : (
+          each.value.image != null
+          ? "${data.google_artifact_registry_repository.container-repository.registry_uri}/${each.value.image}:${var.build_image_tag}"
+          : "${data.google_artifact_registry_repository.container-repository.registry_uri}/${each.key}:${var.build_image_tag}"
+        )
+      )
 
       ports {
         # TODO: make configurable
@@ -205,7 +213,15 @@ resource "google_cloud_run_v2_job" "cronjob" {
       service_account = data.google_service_account.container[each.value.container.id].email
 
       containers {
-        image = each.value.container.image
+        image = (
+          each.value.container.image != null && strcontains(each.value.container.image, "/")
+          ? each.value.container.image
+          : (
+            each.value.container.image != null
+            ? "${data.google_artifact_registry_repository.container-repository.registry_uri}/${each.value.container.image}:${var.build_image_tag}"
+            : "${data.google_artifact_registry_repository.container-repository.registry_uri}/${each.value.container.id}:${var.build_image_tag}"
+          )
+        )
 
         command = ["sh", "-c", each.value.shellCommand]
 
