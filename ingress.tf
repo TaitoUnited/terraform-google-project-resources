@@ -14,9 +14,17 @@
  * limitations under the License.
  */
 
+# Load balancer address
+
+resource "google_compute_global_address" "app" {
+  count = var.create_ingress && local.ingress.enabled ? 1 : 0
+
+  name = "${var.project}-${var.env}"
+}
+
 # Route paths to container backend services
 resource "google_compute_url_map" "app" {
-  count = local.envOwnsIngressUrlMap && length(local.ingressContainerPathsById) > 0 ? 1 : 0
+  count = var.create_ingress_routes && local.ingress.enabled && length(local.ingressContainerPathsById) > 0 && local.envOwnsIngressUrlMap ? 1 : 0
 
   name = "${var.project}-${var.env}"
 
@@ -65,7 +73,7 @@ resource "google_compute_url_map" "app" {
 }
 
 resource "terraform_data" "google_compute_url_map_update" {
-  count = !local.envOwnsIngressUrlMap && length(local.ingressContainerPathsById) > 0 ? 1 : 0
+  count = var.create_ingress_routes && local.ingress.enabled && length(local.ingressContainerPathsById) > 0 && !local.envOwnsIngressUrlMap ? 1 : 0
 
   input = {
     project_id = var.project_id
@@ -145,14 +153,18 @@ resource "google_cloud_run_v2_service_iam_member" "public_invoker" {
   member = "allUsers"
 }
 
-resource "google_compute_global_address" "app" {
-  count = var.create_ingress && local.ingress.enabled ? 1 : 0
+resource "google_compute_global_forwarding_rule" "app" {
+  count = var.create_ingress_routes && local.ingress.enabled && length(local.ingressContainerPathsById) > 0 && local.envOwnsIngressUrlMap ? 1 : 0
 
-  name = "${var.project}-${var.env}"
+  name                  = "${var.project}-${var.env}"
+  ip_address            = google_compute_global_address.app[0].address
+  target                = google_compute_target_https_proxy.app[0].id
+  port_range            = "443"
+  load_balancing_scheme = "EXTERNAL_MANAGED"
 }
 
 resource "google_compute_target_https_proxy" "app" {
-  count = var.create_ingress && local.ingress.enabled ? 1 : 0
+  count = var.create_ingress_routes && local.ingress.enabled && length(local.ingressContainerPathsById) > 0 && local.envOwnsIngressUrlMap ? 1 : 0
 
   name            = "${var.project}-${var.env}"
   url_map         = google_compute_url_map.app[0].id
@@ -161,14 +173,4 @@ resource "google_compute_target_https_proxy" "app" {
   depends_on = [
     google_certificate_manager_certificate_map.app,
   ]
-}
-
-resource "google_compute_global_forwarding_rule" "app" {
-  count = var.create_ingress && local.ingress.enabled ? 1 : 0
-
-  name                  = "${var.project}-${var.env}"
-  ip_address            = google_compute_global_address.app[0].address
-  target                = google_compute_target_https_proxy.app[0].id
-  port_range            = "443"
-  load_balancing_scheme = "EXTERNAL_MANAGED"
 }

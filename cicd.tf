@@ -95,6 +95,23 @@ resource "google_project_iam_member" "cicd_logs_writer" {
   member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }
 
+# TODO: roles/compute.networkAdmin is too broad role for CI/CD
+resource "google_project_iam_member" "cicd_network_admin" {
+  count = var.create_cicd_service_account && var.create_ingress && local.ingress.enabled ? 1 : 0
+
+  project = local.infra_project_id
+  role    = "roles/compute.networkAdmin"
+  member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
+}
+
+resource "google_project_iam_member" "cicd_run_admin" {
+  count = var.create_cicd_service_account ? 1 : 0
+
+  project = local.infra_project_id
+  role    = "roles/run.admin"
+  member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
+}
+
 resource "google_project_iam_member" "cicd_cloudsql_client" {
   count = var.create_cicd_service_account ? 1 : 0
 

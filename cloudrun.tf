@@ -366,7 +366,7 @@ resource "google_cloud_run_v2_job" "cronjob" {
 }
 
 resource "google_service_account" "scheduler" {
-  for_each = local.containerCronJobsById
+  for_each = var.create_container_permissions ? local.containerCronJobsById : {}
 
   account_id   = "${var.project}-${var.env}-${each.key}"
   display_name = "${var.project}-${var.env}-${each.key}"
@@ -374,19 +374,27 @@ resource "google_service_account" "scheduler" {
   depends_on = [module.admin.apis]
 }
 
+data "google_service_account" "scheduler" {
+  for_each = var.create_containers ? local.containerCronJobsById : {}
+
+  account_id = "${var.project}-${var.env}-${each.key}"
+
+  depends_on = [google_service_account.scheduler]
+}
+
 resource "google_cloud_run_v2_job_iam_member" "scheduler" {
-  for_each = local.containerCronJobsById
+  for_each = var.create_container_permissions ? local.containerCronJobsById : {}
 
   location = var.region
-  name     = google_cloud_run_v2_job.cronjob[each.key].name
+  name     = "${var.project}-${var.env}-${each.key}"
 
   role   = "roles/run.invoker"
   member = "serviceAccount:${google_service_account.scheduler[each.key].email}"
 }
 
 resource "google_cloud_scheduler_job" "cronjob" {
-  for_each = local.containerCronJobsById
-  name     = "${var.project}-${var.env}-${each.key}"
+  for_each = var.create_containers ? local.containerCronJobsById : {}
+  name     = "${var.project}-${var.target_env}-${each.key}"
   region   = var.region
 
   schedule  = each.value.schedule
@@ -398,7 +406,7 @@ resource "google_cloud_scheduler_job" "cronjob" {
     uri = "https://run.googleapis.com/v2/projects/${var.project_id}/locations/${var.region}/jobs/${google_cloud_run_v2_job.cronjob[each.key].name}:run"
 
     oauth_token {
-      service_account_email = google_service_account.scheduler[each.key].email
+      service_account_email = data.google_service_account.scheduler[each.key].email
     }
   }
 
