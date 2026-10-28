@@ -38,7 +38,7 @@ auth:
       roles: [ "roles/cloudkms.publicKeyViewer" ]
 
   permissions:
-    - id: "service-PROJECT_NUMBER@serverless-robot-prod.iam.gserviceaccount.com"
+    - id: "serviceAccount:service-GCP_PROJECT_NUMBER@serverless-robot-prod.iam.gserviceaccount.com"
       roles: ["roles/artifactregistry.reader"]
 
 ingress:
@@ -62,19 +62,19 @@ services:
     uptimePath: /
 
   server:
-    type: function # TODO: implement
+    type: container
     path: /api
     uptimePath: /api/uptimez
     timeout: 3
-    runtime: nodejs12.x
-    memoryRequest: 128
     secrets:
       SERVICE_ACCOUNT_KEY: my-project-prod-server-serviceaccount.key
       DATABASE_PASSWORD: my-project-prod-db-app.password
       REDIS_PASSWORD: my-project-prod-redis.password
+    db:
+      useProxy: true
+      instance: myinfra:europe-west1:my-project-postgres
     env:
-      TOPIC_JOBS: my-project-prod-jobs
-      DATABASE_HOST: my-postgres.c45t0ln04uqh.us-east-1.rds.amazonaws.com
+      DATABASE_HOST: /cloudsql/myinfra:europe-west1:my-project-postgres
       DATABASE_PORT: 5432
       DATABASE_SSL_ENABLED: true
       DATABASE_NAME: my-project-prod
@@ -83,7 +83,9 @@ services:
       DATABASE_POOL_MAX: 10
       REDIS_HOST: my-project-prod-001.my-project-prod.nde1c2.use1.cache.amazonaws.com
       REDIS_PORT: 6379
+      TOPIC_JOBS: my-project-prod-jobs
       STORAGE_BUCKET: my-project-prod
+      SOME_SERVICE_URL: https://my-project-prod-generator-GCP_PROJECT_NUMBER.europe-west1.run.app
     cronJobs:
       daily:
         schedule: "0 0 * * *"

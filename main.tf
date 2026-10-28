@@ -269,7 +269,7 @@ locals {
 
 module "admin" {
   source  = "TaitoUnited/admin/google"
-  version = "3.2.2"
+  version = "3.3.0"
 
   project_id = local.project_id
 

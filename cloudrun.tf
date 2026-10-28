@@ -69,7 +69,7 @@ resource "google_cloud_run_v2_service" "container" {
 
         content {
           name  = env.key
-          value = env.value
+          value = replace(env.value, "GCP_PROJECT_NUMBER", data.google_project.project.number)
         }
       }
 
@@ -90,6 +90,7 @@ resource "google_cloud_run_v2_service" "container" {
       }
 
       # Populate cloud run service urls of other services as environment variables
+      /* Replaced with GCP_PROJECT_NUMBER
       dynamic "env" {
         for_each = {
           for key, container in local.containersById :
@@ -103,6 +104,7 @@ resource "google_cloud_run_v2_service" "container" {
           value = "https://${var.project}-${var.env}-${target.key}-${data.google_project.project.number}.${var.region}.run.app"
         }
       }
+      */
 
       resources {
         limits = {
