@@ -48,3 +48,34 @@ data "google_compute_subnetwork" "container" {
 
   depends_on = [google_compute_subnetwork.container]
 }
+
+# Private Service Access for database connection
+
+resource "google_compute_global_address" "private_ip_range" {
+  count = var.create_network ? 1 : 0
+
+  name          = "google-managed-services-app-vpc"
+  purpose       = "VPC_PEERING"
+  address_type  = "INTERNAL"
+  prefix_length = 16
+  network       = google_compute_network.vpc[0].id
+
+  depends_on = [
+    module.admin.apis
+  ]
+}
+
+resource "google_service_networking_connection" "private_vpc_connection" {
+  count = var.create_network ? 1 : 0
+
+  network = google_compute_network.vpc[0].id
+  service = "servicenetworking.googleapis.com"
+
+  reserved_peering_ranges = [
+    google_compute_global_address.private_ip_range[0].name
+  ]
+
+  depends_on = [
+    module.admin.apis
+  ]
+}
