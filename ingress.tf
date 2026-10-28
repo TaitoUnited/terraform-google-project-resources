@@ -45,11 +45,13 @@ resource "google_compute_url_map" "app" {
           "${path_rule.value.path}/*",
         ]
 
+        /* TODO: enable once path_prefix_rewrite support has been implemented for PR envs also.
         route_action {
           url_rewrite {
             path_prefix_rewrite = "/"
           }
         }
+        */
 
         # TODO: add test {}
       }
