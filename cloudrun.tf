@@ -77,7 +77,7 @@ resource "google_cloud_run_v2_service" "container" {
 
         content {
           name  = env.key
-          value = replace(env.value, "GCP_PROJECT_NUMBER", data.google_project.project.number)
+          value = env.value != null ? replace(env.value, "GCP_PROJECT_NUMBER", data.google_project.project.number) : ""
         }
       }
 
@@ -230,7 +230,7 @@ resource "google_cloud_run_v2_job" "cronjob" {
 
           content {
             name  = env.key
-            value = env.value
+            value = env.value != null ? replace(env.value, "GCP_PROJECT_NUMBER", data.google_project.project.number) : ""
           }
         }
 
