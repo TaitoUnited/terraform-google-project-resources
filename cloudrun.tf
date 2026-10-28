@@ -31,6 +31,15 @@ data "google_service_account" "container" {
   depends_on = [google_service_account.container]
 }
 
+# TODO: Grant only db defined
+resource "google_project_iam_member" "container_cloudsql_client" {
+  for_each = var.create_container_permissions ? local.containersById : {}
+
+  project = local.infra_project_id
+  role    = "roles/cloudsql.client"
+  member  = "serviceAccount:${google_service_account.container[each.key].email}"
+}
+
 resource "google_secret_manager_secret_iam_member" "container" {
   for_each = var.create_container_permissions ? local.containerSecretsById : {}
 
@@ -153,6 +162,17 @@ resource "google_cloud_run_v2_service" "container" {
         }
       }
 
+      # Populate secrets defined in secrets as volume mounts
+      dynamic "volume_mounts" {
+        for_each = coalesce(try(each.value.secrets, null), {})
+        iterator = secret
+
+        content {
+          name       = "value"
+          mount_path = "/secrets/${secret.key}"
+        }
+      }
+
       # Database proxy
       dynamic "volume_mounts" {
         for_each = each.value.db.useProxy ? [1] : []
@@ -160,6 +180,25 @@ resource "google_cloud_run_v2_service" "container" {
         content {
           name       = "cloudsql"
           mount_path = "/cloudsql"
+        }
+      }
+    }
+
+    # Secrets
+    dynamic "volumes" {
+      for_each = coalesce(try(each.value.secrets, null), {})
+      iterator = secret
+
+      content {
+        name = secret.key
+
+        secret {
+          secret = secret.value
+
+          items {
+            version = "latest"
+            path    = secret.key
+          }
         }
       }
     }
@@ -253,6 +292,59 @@ resource "google_cloud_run_v2_job" "cronjob" {
           limits = {
             cpu    = coalesce(try(each.value.cpuLimit, null), try(each.value.container.cpuLimit, null), "1")
             memory = coalesce(try(each.value.memoryLimit, null), try(each.value.container.memoryLimit, null), "512Mi")
+          }
+        }
+
+        # Populate secrets defined in secrets as volume mounts
+        dynamic "volume_mounts" {
+          for_each = coalesce(try(each.value.secrets, null), try(each.value.container.secrets, null), {})
+          iterator = secret
+
+          content {
+            name       = "value"
+            mount_path = "/secrets/${secret.key}"
+          }
+        }
+
+        # Database proxy
+        dynamic "volume_mounts" {
+          for_each = each.value.container.db.useProxy ? [1] : []
+
+          content {
+            name       = "cloudsql"
+            mount_path = "/cloudsql"
+          }
+        }
+      }
+
+      # Secrets
+      dynamic "volumes" {
+        for_each = coalesce(try(each.value.secrets, null), try(each.value.container.secrets, null), {})
+        iterator = secret
+
+        content {
+          name = secret.key
+
+          secret {
+            secret = secret.value
+
+            items {
+              version = "latest"
+              path    = secret.key
+            }
+          }
+        }
+      }
+
+      # Database proxy
+      dynamic "volumes" {
+        for_each = each.value.container.db.useProxy ? [1] : []
+        iterator = dummy
+
+        content {
+          name = "cloudsql"
+          cloud_sql_instance {
+            instances = [each.value.container.db.instance]
           }
         }
       }
