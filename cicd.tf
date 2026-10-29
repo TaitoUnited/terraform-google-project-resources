@@ -128,6 +128,14 @@ resource "google_project_iam_member" "cicd_run_admin" {
   member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }
 
+resource "google_project_iam_member" "cicd_cloudscheduler_admin" {
+  count = var.create_cicd_service_account ? 1 : 0
+
+  project = local.infra_project_id
+  role    = "roles/cloudscheduler.admin"
+  member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
+}
+
 resource "google_project_iam_member" "cicd_cloudsql_client" {
   count = var.create_cicd_service_account ? 1 : 0
 
