@@ -21,7 +21,7 @@ provider "google" {
 
   # TODO: remove if causes trouble
   billing_project       = var.project_id
-  user_project_override = true  
+  user_project_override = true
 }
 
 provider "google-beta" {
@@ -31,7 +31,7 @@ provider "google-beta" {
 
   # TODO: remove if causes trouble
   billing_project       = var.project_id
-  user_project_override = true  
+  user_project_override = true
 }
 
 data "google_project" "project" {
@@ -80,7 +80,7 @@ locals {
 
   legacyServiceAccountsById = var.use_legacy_service_accounts ? {
     for name, acc in coalesce(try(var.resources.auth.serviceAccounts, {}), {}) :
-    var.use_legacy_naming ? name : "${name}-${coalesce(acc.provider, "gcp")}" => merge(acc, { name = name})
+    var.use_legacy_naming ? name : "${name}-${coalesce(acc.provider, "gcp")}" => merge(acc, { name = name })
     if var.create_service_accounts && coalesce(acc.provider, "gcp") == "gcp"
   } : {}
 
@@ -104,7 +104,7 @@ locals {
 
   apiKeysById = {
     for name, apiKey in coalesce(try(var.resources.auth.apiKeys, {}), {}) :
-    "${name}-${coalesce(apiKey.provider, "gcp")}" => merge(apiKey, { name = name})
+    "${name}-${coalesce(apiKey.provider, "gcp")}" => merge(apiKey, { name = name })
     if var.create_api_keys && coalesce(apiKey.provider, "gcp") == "gcp"
   }
 
