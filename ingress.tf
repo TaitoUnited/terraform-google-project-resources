@@ -180,7 +180,7 @@ resource "google_compute_target_https_proxy" "app" {
 
   name            = "${var.project}-${var.env}"
   url_map         = google_compute_url_map.app[0].id
-  certificate_map = var.ingress_certificate_map_name # TODO: "//certificatemanager.googleapis.com/${google_certificate_manager_certificate_map.map.id}"
+  certificate_map = "//certificatemanager.googleapis.com/projects/${var.project_id}/locations/global/certificateMaps/${var.ingress_certificate_map_name}"
 
   depends_on = [
     google_certificate_manager_certificate_map.app,

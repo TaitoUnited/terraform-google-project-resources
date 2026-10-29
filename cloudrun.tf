@@ -273,15 +273,16 @@ resource "google_cloud_run_v2_job" "cronjob" {
           }
         }
 
+        # Populate secrets defined in secretEnv as environment variables
         dynamic "env" {
-          for_each = merge(each.value.container.secretEnv, each.value.secretEnv)
-
+          for_each = merge(try(each.value.container.secretEnv, {}), try(each.value.secretEnv, {}))
+          
           content {
             name = env.key
 
             value_source {
               secret_key_ref {
-                secret  = env.value
+                secret  = "${local.project_namespace}_${replace(env.value, ".", "_")}"
                 version = "latest"
               }
             }
@@ -386,7 +387,7 @@ resource "google_cloud_run_v2_job_iam_member" "scheduler" {
   for_each = var.create_containers ? local.containerCronJobsById : {}
 
   location = var.region
-  name     = "${var.project}-${var.env}-${each.key}"
+  name     = "${var.project}-${var.target_env}-${each.key}"
 
   role   = "roles/run.invoker"
   member = "serviceAccount:${data.google_service_account.scheduler[each.key].email}"
