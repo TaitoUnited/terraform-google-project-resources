@@ -169,7 +169,7 @@ resource "google_cloud_run_v2_service" "container" {
 
         content {
           name       = "value"
-          mount_path = "/secrets/${secret.key}"
+          mount_path = "/run/secrets/${secret.key}"
         }
       }
 
@@ -302,7 +302,7 @@ resource "google_cloud_run_v2_job" "cronjob" {
 
           content {
             name       = "value"
-            mount_path = "/secrets/${secret.key}"
+            mount_path = "/run/secrets/${secret.key}"
           }
         }
 
