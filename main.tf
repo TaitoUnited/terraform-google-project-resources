@@ -281,6 +281,7 @@ module "admin" {
 module "databases" {
   depends_on = [
     module.admin.apis,
+    google_service_networking_connection.private_vpc_connection,
   ]
 
   source  = "TaitoUnited/databases/google"
