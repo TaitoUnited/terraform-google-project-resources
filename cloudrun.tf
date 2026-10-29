@@ -383,13 +383,13 @@ data "google_service_account" "scheduler" {
 }
 
 resource "google_cloud_run_v2_job_iam_member" "scheduler" {
-  for_each = var.create_container_permissions ? local.containerCronJobsById : {}
+  for_each = var.create_containers ? local.containerCronJobsById : {}
 
   location = var.region
   name     = "${var.project}-${var.env}-${each.key}"
 
   role   = "roles/run.invoker"
-  member = "serviceAccount:${google_service_account.scheduler[each.key].email}"
+  member = "serviceAccount:${data.google_service_account.scheduler[each.key].email}"
 }
 
 resource "google_cloud_scheduler_job" "cronjob" {

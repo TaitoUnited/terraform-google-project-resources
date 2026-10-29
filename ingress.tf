@@ -20,6 +20,10 @@ resource "google_compute_global_address" "app" {
   count = var.create_ingress && local.ingress.enabled ? 1 : 0
 
   name = "${var.project}-${var.env}"
+
+  depends_on = [
+    module.admin.apis,
+  ]
 }
 
 # Route paths to container backend services

@@ -17,6 +17,8 @@
 resource "google_certificate_manager_certificate_map" "app" {
   count = var.create_ingress_certificate_map ? 1 : 0
   name  = var.ingress_certificate_map_name
+
+  depends_on = [module.admin.apis]
 }
 
 resource "google_certificate_manager_certificate" "certificate" {
