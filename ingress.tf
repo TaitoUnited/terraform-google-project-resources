@@ -26,6 +26,16 @@ resource "google_compute_global_address" "app" {
   ]
 }
 
+data "google_compute_global_address" "app" {
+  count = local.ingress.enabled ? 1 : 0
+
+  name = "${var.project}-${var.env}"
+
+  depends_on = [
+    google_compute_global_address.app,
+  ]
+}
+
 # Route paths to container backend services
 resource "google_compute_url_map" "app" {
   count = var.create_ingress_routes && local.ingress.enabled && length(local.ingressContainerPathsById) > 0 && local.envOwnsIngressUrlMap ? 1 : 0
@@ -44,7 +54,7 @@ resource "google_compute_url_map" "app" {
 
   path_matcher {
     name            = var.env
-    default_service = google_compute_backend_service.container[values(local.ingressContainersById)[0]].id
+    default_service = google_compute_backend_service.container[keys(local.ingressContainersById)[0]].id
 
     dynamic "path_rule" {
       for_each = local.ingressContainerPathsById
@@ -84,7 +94,7 @@ resource "terraform_data" "google_compute_url_map_update" {
     target_env = var.target_env
     hosts      = join(",", local.allDomainNames)
 
-    default_service = google_compute_backend_service.container[values(local.ingressContainersById)[0]].id
+    default_service = google_compute_backend_service.container[keys(local.ingressContainersById)[0]].id
 
     backend_service_path_rules = join(",", flatten([
       for itemId, item in local.ingressContainerPathsById : [
@@ -159,7 +169,7 @@ resource "google_compute_global_forwarding_rule" "app" {
   count = var.create_ingress_routes && local.ingress.enabled && length(local.ingressContainerPathsById) > 0 && local.envOwnsIngressUrlMap ? 1 : 0
 
   name                  = "${var.project}-${var.env}"
-  ip_address            = google_compute_global_address.app[0].address
+  ip_address            = data.google_compute_global_address.app[0].address
   target                = google_compute_target_https_proxy.app[0].id
   port_range            = "443"
   load_balancing_scheme = "EXTERNAL_MANAGED"
