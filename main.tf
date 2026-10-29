@@ -293,7 +293,7 @@ module "databases" {
   ]
 
   source  = "TaitoUnited/databases/google"
-  version = "3.4.0"
+  version = "3.5.0"
 
   postgresql_clusters = values(local.postgresDatabasesById)
   mysql_clusters      = values(local.mysqlDatabasesById)
