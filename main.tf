@@ -59,28 +59,28 @@ locals {
   # Admin stuff
 
   permissionsById = {
-    for item in coalesce(try(var.resources.auth.permissions, []), []) :
-    "${item.id}-${coalesce(item.provider, "gcp")}" => item
+    for id, item in coalesce(try(var.resources.auth.permissions, {}), {}) :
+    "${id}-${coalesce(item.provider, "gcp")}" => merge(item, { id = id })
     if var.create_permissions && coalesce(item.provider, "gcp") == "gcp"
   }
 
   apisById = {
-    for item in coalesce(try(var.resources.auth.apis, []), []) :
-    "${item.id}-${coalesce(item.provider, "gcp")}" => item
+    for id, item in coalesce(try(var.resources.auth.apis, {}), {}) :
+    "${id}-${coalesce(item.provider, "gcp")}" => merge(item, { id = id })
     if var.create_apis && coalesce(item.provider, "gcp") == "gcp"
   }
 
   # Service accounts
 
   serviceAccountsById = var.use_legacy_service_accounts ? {} : {
-    for item in coalesce(try(var.resources.auth.serviceAccounts, []), []) :
-    var.use_legacy_naming ? item.name : "${item.name}-${coalesce(item.provider, "gcp")}" => item
+    for name, item in coalesce(try(var.resources.auth.serviceAccounts, {}), {}) :
+    var.use_legacy_naming ? name : "${name}-${coalesce(item.provider, "gcp")}" => merge(item, { name = name })
     if var.create_service_accounts && coalesce(item.provider, "gcp") == "gcp"
   }
 
   legacyServiceAccountsById = var.use_legacy_service_accounts ? {
-    for acc in coalesce(try(var.resources.auth.serviceAccounts, []), []) :
-    var.use_legacy_naming ? acc.name : "${acc.name}-${coalesce(acc.provider, "gcp")}" => acc
+    for name, acc in coalesce(try(var.resources.auth.serviceAccounts, {}), {}) :
+    var.use_legacy_naming ? name : "${name}-${coalesce(acc.provider, "gcp")}" => merge(acc, { name = name})
     if var.create_service_accounts && coalesce(acc.provider, "gcp") == "gcp"
   } : {}
 
@@ -103,8 +103,8 @@ locals {
   # API keys
 
   apiKeysById = {
-    for apiKey in coalesce(try(var.resources.auth.apiKeys, []), []) :
-    "${apiKey.name}-${coalesce(apiKey.provider, "gcp")}" => apiKey
+    for name, apiKey in coalesce(try(var.resources.auth.apiKeys, {}), {}) :
+    "${name}-${coalesce(apiKey.provider, "gcp")}" => merge(apiKey, { name = name})
     if var.create_api_keys && coalesce(apiKey.provider, "gcp") == "gcp"
   }
 
