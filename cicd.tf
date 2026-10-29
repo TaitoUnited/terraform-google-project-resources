@@ -104,6 +104,22 @@ resource "google_project_iam_member" "cicd_network_admin" {
   member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
 }
 
+resource "google_project_iam_member" "cicd_certificatemanager_editor" {
+  count = var.create_cicd_service_account && var.create_ingress && local.ingress.enabled ? 1 : 0
+
+  project = local.infra_project_id
+  role    = "roles/certificatemanager.editor"
+  member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
+}
+
+resource "google_project_iam_member" "cicd_serviceaccount_viewer" {
+  count = var.create_cicd_service_account ? 1 : 0
+
+  project = local.infra_project_id
+  role    = "roles/iam.serviceAccountViewer"
+  member  = "serviceAccount:${google_service_account.cicd_service_account[0].email}"
+}
+
 resource "google_project_iam_member" "cicd_run_admin" {
   count = var.create_cicd_service_account ? 1 : 0
 
