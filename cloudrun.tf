@@ -276,7 +276,7 @@ resource "google_cloud_run_v2_job" "cronjob" {
         # Populate secrets defined in secretEnv as environment variables
         dynamic "env" {
           for_each = merge(try(each.value.container.secretEnv, {}), try(each.value.secretEnv, {}))
-          
+
           content {
             name = env.key
 
@@ -393,10 +393,10 @@ resource "google_cloud_run_v2_job_iam_member" "scheduler" {
   member = "serviceAccount:${data.google_service_account.scheduler[each.key].email}"
 }
 
-resource "google_cloud_scheduler_job" "cronjob" {
+resource "google_cloud_scheduler_job" "scheduler" {
   for_each = var.create_containers ? local.containerCronJobsById : {}
   name     = "${var.project}-${var.target_env}-${each.key}"
-  region   = var.region
+  region   = coalesce(var.scheduler_region, var.region)
 
   schedule  = each.value.schedule
   time_zone = coalesce(each.value.timeZone, "Etc/UTC")

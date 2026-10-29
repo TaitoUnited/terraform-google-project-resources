@@ -245,6 +245,14 @@ variable "zone" {
   description = "Google Cloud zone."
 }
 
+# Service specific regions
+
+variable "scheduler_region" {
+  type        = string
+  default     = ""
+  description = "Google Cloud region for scheduler. If not set, var.region is used by default."
+}
+
 # Network
 
 variable "vpc_name" {
