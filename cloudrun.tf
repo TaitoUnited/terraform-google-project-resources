@@ -369,8 +369,8 @@ resource "google_cloud_run_v2_job" "cronjob" {
 resource "google_service_account" "scheduler" {
   for_each = var.create_container_permissions ? local.containerCronJobsById : {}
 
-  account_id   = "${var.project}-${var.env}-cr-${each.key}"
-  display_name = "${var.project}-${var.env}-cr-${each.key}"
+  account_id   = "${var.project}-${var.env}-${each.key}"
+  display_name = "${var.project}-${var.env}-${each.key}"
 
   depends_on = [module.admin.apis]
 }
@@ -378,7 +378,7 @@ resource "google_service_account" "scheduler" {
 data "google_service_account" "scheduler" {
   for_each = var.create_containers ? local.containerCronJobsById : {}
 
-  account_id = "${var.project}-${var.env}-cr-${each.key}"
+  account_id = "${var.project}-${var.env}-${each.key}"
 
   depends_on = [google_service_account.scheduler]
 }
