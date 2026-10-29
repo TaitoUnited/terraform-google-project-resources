@@ -60,13 +60,13 @@ locals {
 
   permissionsById = {
     for id, item in coalesce(try(var.resources.auth.permissions, {}), {}) :
-    "${id}-${coalesce(item.provider, "gcp")}" => merge(item, { id = id })
+    "${coalesce(item.id, id)}-${coalesce(item.provider, "gcp")}" => merge(item, { id = coalesce(item.id, id) })
     if var.create_permissions && coalesce(item.provider, "gcp") == "gcp"
   }
 
   apisById = {
     for id, item in coalesce(try(var.resources.auth.apis, {}), {}) :
-    "${id}-${coalesce(item.provider, "gcp")}" => merge(item, { id = id })
+    "${coalesce(item.id, id)}-${coalesce(item.provider, "gcp")}" => merge(item, { id = coalesce(item.id, id) })
     if var.create_apis && coalesce(item.provider, "gcp") == "gcp"
   }
 
@@ -74,13 +74,13 @@ locals {
 
   serviceAccountsById = var.use_legacy_service_accounts ? {} : {
     for name, item in coalesce(try(var.resources.auth.serviceAccounts, {}), {}) :
-    var.use_legacy_naming ? name : "${name}-${coalesce(item.provider, "gcp")}" => merge(item, { name = name })
+    var.use_legacy_naming ? name : "${coalesce(item.name, name)}-${coalesce(item.provider, "gcp")}" => merge(item, { name = coalesce(item.name, name) })
     if var.create_service_accounts && coalesce(item.provider, "gcp") == "gcp"
   }
 
   legacyServiceAccountsById = var.use_legacy_service_accounts ? {
     for name, acc in coalesce(try(var.resources.auth.serviceAccounts, {}), {}) :
-    var.use_legacy_naming ? name : "${name}-${coalesce(acc.provider, "gcp")}" => merge(acc, { name = name })
+    var.use_legacy_naming ? name : "${coalesce(acc.name, name)}-${coalesce(acc.provider, "gcp")}" => merge(acc, { name = coalesce(acc.name, name) })
     if var.create_service_accounts && coalesce(acc.provider, "gcp") == "gcp"
   } : {}
 
@@ -104,7 +104,7 @@ locals {
 
   apiKeysById = {
     for name, apiKey in coalesce(try(var.resources.auth.apiKeys, {}), {}) :
-    "${name}-${coalesce(apiKey.provider, "gcp")}" => merge(apiKey, { name = name })
+    "${coalesce(apiKey.name, name)}-${coalesce(apiKey.provider, "gcp")}" => merge(apiKey, { name = coalesce(apiKey.name, name) })
     if var.create_api_keys && coalesce(apiKey.provider, "gcp") == "gcp"
   }
 

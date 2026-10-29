@@ -372,20 +372,24 @@ variable "resources" {
 
     auth = optional(object({
       serviceAccounts = optional(map(object({
+        name     = optional(string)
         provider = optional(string)
         roles    = optional(list(string))
       })))
 
       permissions = optional(map(object({
+        id       = optional(string)
         provider = optional(string)
         roles    = list(string)
       })))
 
       apis = optional(map(object({
+        id       = optional(string)
         provider = optional(string)
       })))
 
       apiKeys = optional(map(object({
+        name     = optional(string)
         provider = optional(string)
         origins  = optional(list(string))
         services = list(object({

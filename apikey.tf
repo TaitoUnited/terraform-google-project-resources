@@ -33,8 +33,13 @@ resource "google_apikeys_key" "api_key" {
       }
     }
 
-    browser_key_restrictions {
-      allowed_referrers = coalesce(each.value.origins, [])
+    dynamic "browser_key_restrictions" {
+      for_each = length(coalesce(each.value.origins, [])) > 0 ? [1] : []
+      iterator = dummy
+
+      content {
+        allowed_referrers = coalesce(each.value.origins, [])
+      }
     }
   }
 }

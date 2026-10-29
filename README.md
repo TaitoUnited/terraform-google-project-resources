@@ -16,30 +16,50 @@ alerts:
       severity>=ERROR
 
 auth:
+  permissions:
+    # Developers
+    john:
+      id: "user:john.doe@mydomain.com"
+      roles: ["roles/editor"]
+    # Google owned service accounts
+    serverless:
+      id: "serviceAccount:service-GCP_PROJECT_NUMBER@serverless-robot-prod.iam.gserviceaccount.com"
+      roles: ["roles/artifactregistry.reader"]
+
   apis:
-    - id: compute.googleapis.com
-    - id: run.googleapis.com
-    - id: secretmanager.googleapis.com
-    - id: servicenetworking.googleapis.com
-    - id: certificatemanager.googleapis.com
-    - id: sqladmin.googleapis.com
-    - id: cloudbuild.googleapis.com
+    # Infra
+    artifactregistry.googleapis.com: {}
+    compute.googleapis.com: {}
+    run.googleapis.com: {}
+    cloudscheduler.googleapis.com: {}
+    servicenetworking.googleapis.com: {}
+    certificatemanager.googleapis.com: {}
+    apikeys.googleapis.com: {}
+    secretmanager.googleapis.com: {}
+    sqladmin.googleapis.com: {}
+    cloudbuild.googleapis.com: {}
+    # Application
+    generativelanguage.googleapis.com: {}
+    picker.googleapis.com: {}
 
   apiKeys:
-    - name: my-project-prod-client
-      origins: [ "https://myproject.mydomain.com" ]
+    gemini:
+      name: "myproject-dev-gemini"
       services:
-        - name: maps.googleapis.com
-          methods: ["GET*"]
+        - id: generativelanguage.googleapis.com
+    picker:
+      name: "myproject-dev-picker"
+      services:
+        - id: picker.googleapis.com
+      origins:
+        - "https://mydomain.com/*"
 
   serviceAccounts:
-    - name: my-project-prod-server
-    - name: my-project-prod-worker
+    server:
+      name: my-project-prod-server
+    worker:
+      name: my-project-prod-worker
       roles: [ "roles/cloudkms.publicKeyViewer" ]
-
-  permissions:
-    - id: "serviceAccount:service-GCP_PROJECT_NUMBER@serverless-robot-prod.iam.gserviceaccount.com"
-      roles: ["roles/artifactregistry.reader"]
 
 ingress:
   class: gateway
