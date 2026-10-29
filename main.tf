@@ -45,6 +45,7 @@ locals {
   project_id                    = var.project_id
   infra_project_id              = coalesce(var.infra_project_id, local.project_id)
   container_registry_project_id = coalesce(var.container_registry_project_id, var.infra_project_id, local.project_id)
+  project_namespace             = "${var.project}-${var.env}"
 
   cicd_project_id = coalesce(var.cicd_project_id, var.infra_project_id, var.project_id)
 

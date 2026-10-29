@@ -43,7 +43,7 @@ resource "google_project_iam_member" "container_cloudsql_client" {
 resource "google_secret_manager_secret_iam_member" "container" {
   for_each = var.create_container_permissions ? local.containerSecretsById : {}
 
-  secret_id = replace(each.value.secretName, ".", "-")
+  secret_id = "${local.project_namespace}_${replace(each.value.secretName, ".", "_")}"
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.container[each.value.containerId].email}"
 }
@@ -99,7 +99,7 @@ resource "google_cloud_run_v2_service" "container" {
 
           value_source {
             secret_key_ref {
-              secret  = replace(env.value, ".", "-")
+              secret  = "${local.project_namespace}_${replace(env.value, ".", "_")}"
               version = "latest"
             }
           }
@@ -193,7 +193,7 @@ resource "google_cloud_run_v2_service" "container" {
         name = secret.key
 
         secret {
-          secret = replace(secret.value, ".", "-")
+          secret = "${local.project_namespace}_${replace(secret.value, ".", "_")}"
 
           items {
             version = "latest"
@@ -326,7 +326,7 @@ resource "google_cloud_run_v2_job" "cronjob" {
           name = secret.key
 
           secret {
-            secret = replace(secret.value, ".", "-")
+            secret = "${local.project_namespace}_${replace(secret.value, ".", "_")}"
 
             items {
               version = "latest"
