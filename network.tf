@@ -54,7 +54,7 @@ data "google_compute_subnetwork" "container" {
 resource "google_compute_global_address" "private_ip_range" {
   count = var.create_network ? 1 : 0
 
-  name          = "google-managed-services-app-vpc"
+  name          = "${var.vpc_name}-google-peering"
   purpose       = "VPC_PEERING"
   address_type  = "INTERNAL"
   prefix_length = 16
