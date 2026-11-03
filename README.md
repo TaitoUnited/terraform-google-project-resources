@@ -214,6 +214,43 @@ services:
     adminUsername: admin
 ```
 
+### Cloud Run health checks
+
+Container services support these optional settings:
+
+| Setting | Default | Purpose |
+| --- | --- | --- |
+| `startupInitialDelaySeconds` | `0` | Delay before the first startup probe, in seconds. |
+| `startupPeriodSeconds` | `10` | Interval between startup probes, in seconds. |
+| `startupTimeoutSeconds` | `2` | Timeout for each startup probe, in seconds. |
+| `startupFailureThreshold` | `3` | Consecutive startup probe failures before shutdown. |
+| `livenessPath` | `/healthz` | HTTP path shared by startup and liveness probes. Omitted or null uses `/healthz`. |
+
+```yaml
+services:
+  server:
+    type: container
+    livenessPath: /api/healthz
+    startupInitialDelaySeconds: 0
+    startupPeriodSeconds: 10
+    startupTimeoutSeconds: 2
+    startupFailureThreshold: 12
+```
+
+This example selects `/api/healthz` for both probes and a nominal startup allowance
+of `startupFailureThreshold * startupPeriodSeconds` (120 seconds). A successful
+probe can accept the container sooner; the allowance does not add a fixed wait.
+Liveness checks begin after startup succeeds and retain their existing timing
+(`0`, `10`, `2`, `3`), so increasing the startup allowance does not extend failure
+detection after startup. Probe paths address the container directly and are
+independent of ingress paths and route rewriting.
+
+Use integer timing values within the limits supported by
+[Cloud Run](https://docs.cloud.google.com/run/docs/configuring/healthchecks) and the
+[Google provider](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloud_run_v2_service#nested_startup_probe).
+The timeout must not exceed the period. As with other service settings, the
+module relies on provider/API validation rather than adding custom validation.
+
 With `create_*` variables you can choose which resources are created/updated in which phase. For example, you can choose to update some of the resources manually when the environment is created or updated:
 
 ```

@@ -138,11 +138,10 @@ resource "google_cloud_run_v2_service" "container" {
             path = coalesce(try(each.value.livenessPath, null), "/healthz")
           }
 
-          # TODO: make configurable
-          initial_delay_seconds = 0
-          period_seconds        = 10
-          timeout_seconds       = 2
-          failure_threshold     = 3
+          initial_delay_seconds = each.value.startupInitialDelaySeconds
+          period_seconds        = each.value.startupPeriodSeconds
+          timeout_seconds       = each.value.startupTimeoutSeconds
+          failure_threshold     = each.value.startupFailureThreshold
         }
       }
 

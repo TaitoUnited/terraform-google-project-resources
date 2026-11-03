@@ -429,6 +429,12 @@ variable "resources" {
       cpuLimit    = optional(string)
       memoryLimit = optional(string)
 
+      startupInitialDelaySeconds = optional(number, 0)
+      startupPeriodSeconds       = optional(number, 10)
+      startupTimeoutSeconds      = optional(number, 2)
+      startupFailureThreshold    = optional(number, 3)
+      livenessPath               = optional(string, "/healthz")
+
       paths = optional(list(object({
         path                  = string
         rewriteTargetDisabled = optional(bool, false)
