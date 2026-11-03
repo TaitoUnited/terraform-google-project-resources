@@ -430,7 +430,7 @@ variable "resources" {
       memoryLimit = optional(string)
 
       paths = optional(list(object({
-        path = string
+        path                  = string
         rewriteTargetDisabled = optional(bool, false)
       })))
 
