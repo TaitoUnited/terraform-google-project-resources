@@ -386,8 +386,9 @@ data "google_service_account" "scheduler" {
 resource "google_cloud_run_v2_job_iam_member" "scheduler" {
   for_each = var.create_containers ? local.containerCronJobsById : {}
 
+  # Referencing the job orders its creation before the invoker IAM grant.
   location = var.region
-  name     = "${var.project}-${var.target_env}-${each.key}"
+  name     = google_cloud_run_v2_job.cronjob[each.key].name
 
   role   = "roles/run.invoker"
   member = "serviceAccount:${data.google_service_account.scheduler[each.key].email}"
