@@ -68,7 +68,7 @@ resource "google_compute_url_map" "app" {
         ]
 
         dynamic "route_action" {
-          for_each = path_rule.value.path.rewriteTargetDisabled ? [] : [1]
+          for_each = path_rule.value.rewriteTargetDisabled ? [] : [1]
           iterator = dummy
 
           content {

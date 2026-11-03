@@ -231,9 +231,10 @@ locals {
       for containerId, container in local.ingressContainersById : [
         for item in container.paths :
         {
-          id          = "${containerId}-${item.path}"
-          containerId = containerId
-          path        = item.path
+          id                    = "${containerId}-${item.path}"
+          containerId           = containerId
+          path                  = item.path
+          rewriteTargetDisabled = item.rewriteTargetDisabled
         }
       ]
     ]) : item.id => item
