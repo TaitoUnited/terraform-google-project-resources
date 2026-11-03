@@ -433,7 +433,7 @@ variable "resources" {
       startupPeriodSeconds       = optional(number, 10)
       startupTimeoutSeconds      = optional(number, 2)
       startupFailureThreshold    = optional(number, 3)
-      livenessPath               = optional(string)
+      livenessPath               = optional(string, "/healthz")
 
       paths = optional(list(object({
         path                  = string
