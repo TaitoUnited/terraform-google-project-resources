@@ -431,6 +431,7 @@ variable "resources" {
 
       paths = optional(list(object({
         path = string
+        rewriteTargetDisabled = optional(bool, false)
       })))
 
       # For databases

@@ -67,9 +67,14 @@ resource "google_compute_url_map" "app" {
           "${path_rule.value.path}/*",
         ]
 
-        route_action {
-          url_rewrite {
-            path_prefix_rewrite = "/"
+        dynamic "route_action" {
+          for_each = path_rule.value.path.rewriteTargetDisabled ? [] : [1]
+          iterator = dummy
+
+          content {
+            url_rewrite {
+              path_prefix_rewrite = "/"
+            }
           }
         }
 
