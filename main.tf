@@ -111,21 +111,11 @@ locals {
 
   # Alerts
 
-  origAlerts = coalesce(var.resources.alerts, [])
+  alerts = coalesce(var.resources.alerts, [])
 
   alertChannelNames = flatten([
-    for alert in local.origAlerts :
+    for alert in local.alerts :
     coalesce(alert.channels, [])
-  ])
-
-  alerts = flatten([
-    for alert in local.origAlerts :
-    merge(alert, {
-      channelIndices = [
-        for channel in alert.channels :
-        index(local.alertChannelNames, channel)
-      ]
-    })
   ])
 
   logAlerts = flatten([

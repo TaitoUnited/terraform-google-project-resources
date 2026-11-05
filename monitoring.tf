@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Taito United
+ * Copyright 2026 Taito United
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,30 +23,34 @@ data "google_monitoring_notification_channel" "log_alert_channel" {
 # TODO: Add support for log metric absence
 
 resource "google_monitoring_alert_policy" "log_alert_policy" {
-  depends_on = [
-    google_logging_metric.log_alert_metric,
-  ]
   for_each = { for item in(var.create_log_alert_policies ? local.logAlerts : []) : item.name => item }
-  project  = local.log_alert_project_id
 
   display_name = each.value.name
+  project      = local.log_alert_project_id
   enabled      = true
+
   notification_channels = [
-    for i in each.value.channelIndices :
-    data.google_monitoring_notification_channel.log_alert_channel[i].name
+    for channel in each.value.channels :
+    data.google_monitoring_notification_channel.log_alert_channel[channel].name
   ]
 
   combiner = "OR"
   conditions {
     display_name = each.value.name
-    condition_threshold {
-      filter     = "metric.type=\"logging.googleapis.com/user/${each.value.name}\" AND resource.type=\"k8s_container\""
-      duration   = "60s"
-      comparison = "COMPARISON_GT"
-      aggregations {
-        alignment_period   = "60s"
-        per_series_aligner = "ALIGN_RATE"
-      }
+    condition_matched_log {
+      filter = each.value.rule
     }
   }
+
+  alert_strategy {
+    notification_rate_limit {
+      period = "3600s"
+    }
+
+    auto_close = "604800s"
+  }
+
+  depends_on = [
+    module.admin.apis,
+  ]
 }
