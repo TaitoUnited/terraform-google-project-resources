@@ -44,10 +44,10 @@ resource "google_monitoring_alert_policy" "log_alert_policy" {
 
   alert_strategy {
     notification_rate_limit {
-      period = "3600s"
+      period = each.value.rateLimit
     }
 
-    auto_close = "604800s"
+    auto_close = each.value.autoClose
   }
 
   depends_on = [

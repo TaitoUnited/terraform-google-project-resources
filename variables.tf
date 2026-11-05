@@ -372,10 +372,12 @@ variable "resources" {
     uptimeEnabled = optional(bool)
 
     alerts = optional(list(object({
-      name     = string
-      type     = string
-      channels = list(string)
-      rule     = string
+      name      = string
+      type      = string
+      channels  = list(string)
+      rule      = string
+      rateLimit = optional(string, "3600s")
+      autoClose = optional(string, "86400s")
     })))
 
     auth = optional(object({

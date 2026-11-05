@@ -14,6 +14,8 @@ alerts:
       resource.type="k8s_container"
       resource.labels.namespace_name="my-project-prod"
       severity>=ERROR
+    rateLimit: 3600s
+    autoClose: 7200s
 
 auth:
   permissions:
@@ -218,13 +220,13 @@ services:
 
 Container services support these optional settings:
 
-| Setting | Default | Purpose |
-| --- | --- | --- |
-| `startupInitialDelaySeconds` | `0` | Delay before the first startup probe, in seconds. |
-| `startupPeriodSeconds` | `10` | Interval between startup probes, in seconds. |
-| `startupTimeoutSeconds` | `2` | Timeout for each startup probe, in seconds. |
-| `startupFailureThreshold` | `3` | Consecutive startup probe failures before shutdown. |
-| `livenessPath` | `/healthz` | HTTP path shared by startup and liveness probes. Omitted or null uses `/healthz`. |
+| Setting                      | Default    | Purpose                                                                           |
+| ---------------------------- | ---------- | --------------------------------------------------------------------------------- |
+| `startupInitialDelaySeconds` | `0`        | Delay before the first startup probe, in seconds.                                 |
+| `startupPeriodSeconds`       | `10`       | Interval between startup probes, in seconds.                                      |
+| `startupTimeoutSeconds`      | `2`        | Timeout for each startup probe, in seconds.                                       |
+| `startupFailureThreshold`    | `3`        | Consecutive startup probe failures before shutdown.                               |
+| `livenessPath`               | `/healthz` | HTTP path shared by startup and liveness probes. Omitted or null uses `/healthz`. |
 
 ```yaml
 services:
