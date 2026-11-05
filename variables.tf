@@ -420,7 +420,7 @@ variable "resources" {
     }))
 
     services = optional(map(object({
-      type        = string
+      type        = optional(string)
       image       = optional(string)
       machineType = optional(string)
       name        = optional(string)
