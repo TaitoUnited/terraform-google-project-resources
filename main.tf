@@ -113,10 +113,10 @@ locals {
 
   alerts = coalesce(var.resources.alerts, [])
 
-  alertChannelNames = flatten([
+  alertChannelNames = distinct(flatten([
     for alert in local.alerts :
     coalesce(alert.channels, [])
-  ])
+  ]))
 
   logAlerts = flatten([
     for alert in local.alerts :
