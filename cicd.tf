@@ -148,7 +148,7 @@ resource "google_project_iam_member" "cicd_serviceaccount_viewer" {
 }
 
 resource "google_project_iam_member" "cicd_run_admin" {
-  count = var.create_cicd_service_account ? 1 : 0
+  count = var.create_cicd_service_account && local.cloudRunEnabled ? 1 : 0
 
   project = local.infra_project_id
   role    = "roles/run.admin"
@@ -156,7 +156,7 @@ resource "google_project_iam_member" "cicd_run_admin" {
 }
 
 resource "google_project_iam_member" "cicd_cloudscheduler_admin" {
-  count = var.create_cicd_service_account ? 1 : 0
+  count = var.create_cicd_service_account && local.cloudRunEnabled ? 1 : 0
 
   project = local.infra_project_id
   role    = "roles/cloudscheduler.admin"
