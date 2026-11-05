@@ -71,9 +71,9 @@ resource "google_service_account_iam_member" "cicd_iam_service_account_user" {
 
 # CI/CD must attach each scheduler identity when creating authenticated schedules.
 resource "google_service_account_iam_member" "cicd_iam_scheduler_service_account_user" {
-  for_each = var.create_cicd_service_account && var.create_container_permissions ? local.containerCronJobsById : {}
+  for_each = var.create_cicd_service_account ? local.containerCronJobsById : {}
 
-  service_account_id = google_service_account.scheduler[each.key].name
+  service_account_id = data.google_service_account.scheduler[each.key].name
   role               = "roles/iam.serviceAccountUser"
   member             = "serviceAccount:${data.google_service_account.cicd_service_account.email}"
 }
