@@ -71,6 +71,8 @@ resource "google_service_account_iam_member" "cicd_iam_service_account_user" {
 
 # Grant access in the root that owns the scheduler service accounts.
 resource "google_service_account_iam_member" "cicd_iam_scheduler_service_account_user" {
+  # TODO: Optimally create_cicd_service_account should not be dependent on create_container_permissions
+  # and this should be possible be referring to data.google_service_account. However, caused trouble on CloudRun enabled projects.
   for_each = var.create_cicd_service_account && var.create_container_permissions ? local.containerCronJobsById : {}
 
   service_account_id = google_service_account.scheduler[each.key].name
