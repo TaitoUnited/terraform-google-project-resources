@@ -253,6 +253,19 @@ Use integer timing values within the limits supported by
 The timeout must not exceed the period. As with other service settings, the
 module relies on provider/API validation rather than adding custom validation.
 
+Each `services.<service>.cronJobs.<job>` supports `taskTimeoutSeconds`, the Cloud
+Run timeout in seconds per task attempt, including each retry. It defaults to
+`600` when omitted.
+
+```yaml
+cronJobs:
+  avaa-sync:
+    schedule: "0 0 * * *"
+    timeZone: Europe/Helsinki
+    shellCommand: ./cli.sh avaa-sync --all
+    taskTimeoutSeconds: 1800
+```
+
 With `create_*` variables you can choose which resources are created/updated in which phase. For example, you can choose to update some of the resources manually when the environment is created or updated:
 
 ```
