@@ -249,6 +249,7 @@ resource "google_cloud_run_v2_job" "cronjob" {
   template {
     template {
       service_account = data.google_service_account.container[each.value.container.id].email
+      timeout         = "${each.value.taskTimeoutSeconds}s"
 
       containers {
         image = (

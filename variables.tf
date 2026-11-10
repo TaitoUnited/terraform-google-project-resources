@@ -511,11 +511,12 @@ variable "resources" {
       })))
 
       cronJobs = optional(map(object({
-        schedule     = string
-        timeZone     = optional(string)
-        shellCommand = string
-        env          = optional(map(string), {})
-        secretEnv    = optional(map(string), {})
+        schedule           = string
+        timeZone           = optional(string)
+        shellCommand       = string
+        taskTimeoutSeconds = optional(number, 600)
+        env                = optional(map(string), {})
+        secretEnv          = optional(map(string), {})
       })), {})
 
       db = optional(object({
