@@ -430,6 +430,7 @@ variable "resources" {
 
       cpuLimit    = optional(string)
       memoryLimit = optional(string)
+      cpuIdle     = optional(bool, false)
 
       startupInitialDelaySeconds = optional(number, 0)
       startupPeriodSeconds       = optional(number, 10)

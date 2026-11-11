@@ -216,6 +216,33 @@ services:
     adminUsername: admin
 ```
 
+### Cloud Run CPU allocation and scaling
+
+Set `cpuIdle` per container service to select
+[Cloud Run billing and CPU allocation](https://docs.cloud.google.com/run/docs/configuring/billing-settings):
+
+- `true`: request-based billing, with CPU allocated during request processing.
+- `false`, omitted, or `null`: instance-based billing, preserving the existing
+  always-allocated CPU behavior while an instance is running.
+
+`minReplicas: 0` permits scaling to zero. `maxReplicas` independently controls the
+maximum instance count. CPU allocation does not change these settings or their
+defaults; each falls back to `replicas`, then `1`.
+
+```yaml
+services:
+  server:
+    type: container
+    cpuIdle: true
+    minReplicas: 0
+    maxReplicas: 1
+```
+
+With `cpuIdle: true`, background work after an HTTP response may stall when CPU
+is throttled. Use `false` for services that need CPU outside requests. This
+setting applies only to Cloud Run services; scheduled jobs retain their existing
+CPU allocation behavior.
+
 ### Cloud Run health checks
 
 Container services support these optional settings:
