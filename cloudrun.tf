@@ -124,6 +124,7 @@ resource "google_cloud_run_v2_service" "container" {
       */
 
       resources {
+        cpu_idle = each.value.cpuIdle
         limits = {
           cpu    = coalesce(try(each.value.cpuLimit, null), "1")
           memory = coalesce(try(each.value.memoryLimit, null), "512Mi")
