@@ -117,7 +117,7 @@ resource "terraform_data" "google_compute_url_map_update" {
     command = <<-EOT
       url_map=${self.input.project}-${self.input.env}
       matcher=${self.input.target_env}
-      deadline=$(( $(date +%s) + 900 ))
+      deadline=$(( $(date +%s) + 300 ))
       seed=$(printf '%s' "$matcher" | cksum | cut -d ' ' -f 1)
       while :; do
         if names=$(gcloud compute url-maps describe "$url_map" \
@@ -158,7 +158,7 @@ resource "terraform_data" "google_compute_url_map_update" {
     command = <<-EOT
       url_map=${self.input.project}-${self.input.env}
       matcher=${self.input.target_env}
-      deadline=$(( $(date +%s) + 900 ))
+      deadline=$(( $(date +%s) + 300 ))
       seed=$(printf '%s' "$matcher" | cksum | cut -d ' ' -f 1)
       while :; do
         if names=$(gcloud compute url-maps describe "$url_map" \
