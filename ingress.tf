@@ -119,24 +119,45 @@ resource "terraform_data" "google_compute_url_map_update" {
       matcher=${self.input.target_env}
       deadline=$(( $(date +%s) + 300 ))
       seed=$(printf '%s' "$matcher" | cksum | cut -d ' ' -f 1)
+      added=
       while :; do
+        action=add
         if names=$(gcloud compute url-maps describe "$url_map" \
           --project=${self.input.project_id} \
           --global \
           --format='value(pathMatchers[].name)') &&
           printf '%s\n' "$names" | tr ';' '\n' | grep -qxF "$matcher"; then
-          echo "Path matcher $matcher already exists on URL map $url_map"
-          exit 0
+          if [ -n "$added" ]; then
+            echo "Path matcher $matcher already exists on URL map $url_map"
+            exit 0
+          fi
+          # A matcher present before our first add is a leftover (e.g. from a
+          # failed teardown) and may have stale routes, so replace it.
+          action=remove
         fi
-        if output=$(gcloud compute url-maps add-path-matcher "$url_map" \
-          --project=${self.input.project_id} \
-          --path-matcher-name="$matcher" \
-          --global \
-          --new-hosts=${self.input.hosts} \
-          --default-service=${self.input.default_service} \
-          --backend-service-path-rules=${self.input.backend_service_path_rules} 2>&1); then
+        if [ "$action" = remove ]; then
+          echo "Removing existing path matcher $matcher from URL map $url_map"
+          output=$(gcloud compute url-maps remove-path-matcher "$url_map" \
+            --project=${self.input.project_id} \
+            --path-matcher-name="$matcher" \
+            --global 2>&1)
+        else
+          added=1
+          output=$(gcloud compute url-maps add-path-matcher "$url_map" \
+            --project=${self.input.project_id} \
+            --path-matcher-name="$matcher" \
+            --global \
+            --new-hosts=${self.input.hosts} \
+            --default-service=${self.input.default_service} \
+            --backend-service-path-rules=${self.input.backend_service_path_rules} 2>&1)
+        fi
+        status=$?
+        if [ "$status" -eq 0 ]; then
           printf '%s\n' "$output"
-          exit 0
+          if [ "$action" = add ]; then
+            exit 0
+          fi
+          continue
         fi
         printf '%s\n' "$output" >&2
         if ! printf '%s\n' "$output" | grep -qi -e 'is not ready' -e 'fingerprint'; then
